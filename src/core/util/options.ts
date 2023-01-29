@@ -62,8 +62,15 @@ function mergeData(
     fromVal = from[key]
     if (!recursive || !hasOwn(to, key)) {
       set(to, key, fromVal)
+    } else if (
+      toVal !== fromVal &&
+      isPlainObject(toVal) &&
+      isPlainObject(fromVal)
+    ) {
+      mergeData(toVal, fromVal)
     }
   }
+  return to
 }
 
 /**

@@ -20,7 +20,7 @@ export declare class Component {
   _isDestroyed: boolean
   _isBeingDestroyed: boolean
   _hasHookEvent: boolean
-
+  _data: Record<string, any>
 
   // public properties
   $root: Component

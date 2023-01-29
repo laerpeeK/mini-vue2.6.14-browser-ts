@@ -143,3 +143,42 @@ export function isFalse(v: any): boolean {
   const n = parseFloat(String(val))
   return n >= 0 && Math.floor(n) === n && isFinite(val)
 }
+
+/**
+ * Remove an item from an array.
+ */
+export function remove(arr: Array<any>, item: any): Array<any> | void {
+  const len = arr.length
+  if (len) {
+    // fast path for the only / last item
+    if (item === arr[len - 1]) {
+      arr.length = len - 1
+      return
+    }
+    const index = arr.indexOf(item)
+    if (index > -1) {
+      return arr.splice(index, 1)
+    }
+  }
+}
+
+/**
+ * jack
+ * each val was defined & have property then/catch as function will be seen type as Promise<any>
+ */
+export function isPromise(val: any): val is Promise<any> {
+  return (
+    isDef(val) &&
+    typeof val.then === 'function' &&
+    typeof val.catch === 'function'
+  )
+}
+
+/**
+ * Quick object check - this is primarily used to tell
+ * objects from primitive values when we know the value
+ * is a JSON-compliant type.
+ */
+ export function isObject(obj: any): boolean {
+  return obj !== null && typeof obj === 'object'
+}
