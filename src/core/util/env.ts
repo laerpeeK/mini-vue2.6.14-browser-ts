@@ -68,3 +68,7 @@ export interface SimpleSet {
 }
 
 export { _Set }
+
+// Firefox has a "watch" function on Object.prototype...
+// @ts-expect-error firebox support
+export const nativeWatch = {}.watch

@@ -21,6 +21,9 @@ export declare class Component {
   _isBeingDestroyed: boolean
   _hasHookEvent: boolean
   _data: Record<string, any>
+  _props: Record<string, any>
+  _computedWatchers: { [key: string]: Watcher}
+  _watchers: Array<Watcher>
 
   // public properties
   $root: Component
@@ -30,6 +33,21 @@ export declare class Component {
   $refs: {
     [key: string]: Component | Element | Array<Component | Element> | undefined
   }
-    // lifecycle
-    _init: Function
+  $data: Record<string, any>
+  $props: Record<string, any>
+  $watch: (expOrFn: string | (() => any), cb: Function, options?: Record<string, any>) => Function
+
+  // public methods
+  $set: <T>(
+    target: Record<string, any> | Array<T>,
+    key: string | number,
+    val: T
+  ) => T
+  $delete: <T>(
+    target: Record<string, any> | Array<T>,
+    key: string | number,
+  ) => void
+
+  // lifecycle
+  _init: Function
 }

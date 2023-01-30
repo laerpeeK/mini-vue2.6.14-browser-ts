@@ -4,14 +4,18 @@ import Dep from './dep'
 import { def } from '../util/lang'
 import { isObject, hasOwn, isPlainObject } from '../../shared/util'
 import VNode from '../vdom/vnode'
-import { isServerRendering, hasProto } from '../util/env';
-import { arrayMethods } from './array';
+import { isServerRendering, hasProto } from '../util/env'
+import { arrayMethods } from './array'
 
 /**
  * In some cases we may want to disable observation inside a component's
  * update computation.
  */
 export let shouldObserve: boolean = true
+
+export function toggleObserving (value: boolean) {
+  shouldObserve = value
+}
 
 const arrayKeys = Object.getOwnPropertyNames(arrayMethods)
 
@@ -37,8 +41,15 @@ export class Observer {
       } else {
         copyAugment(value, arrayMethods, arrayKeys)
       }
+      this.observeArray(value)
     } else {
       this.walk(value)
+    }
+  }
+
+  observeArray(items: Array<any>) {
+    for (let i = 0; i < items.length; i++) {
+      observe(items[i])
     }
   }
 
@@ -56,7 +67,7 @@ export class Observer {
  * Augment a target Object or Array by intercepting
  * the prototype chain using __proto__
  */
- function protoAugment(target, src: Object) {
+function protoAugment(target, src: Object) {
   target.__proto__ = src
 }
 
@@ -64,7 +75,7 @@ export class Observer {
  * Augment a target Object or Array by defining
  * hidden properties.
  */
-function copyAugment (target, src: Object, keys: Array<string>) {
+function copyAugment(target, src: Object, keys: Array<string>) {
   for (let i = 0, l = keys.length; i < l; i++) {
     const key = keys[i]
     def(target, key, src[key])
@@ -119,6 +130,39 @@ export function set(
   }
 
   defineReactive(ob.value, key, val)
+}
+
+export function del<T>(array: T[], key: number): void
+export function del(object: object, key: string | number): void
+export function del(target: any[] | object, key: any) {
+  if (process.env.NODE_ENV && (isUndef(target) || isPrimitive(target))) {
+    warn(
+      `Cannot delete reactive property on undefined, null, or primitive value: ${target}`
+    )
+  }
+
+  if (isArray(target) && isValidArrayIndex(key)) {
+    target.splice(key, 1)
+    return
+  }
+
+  const ob = (target as any).__ob__
+  if ((target as any)._isVue || (ob && ob.vmCount)) {
+    process.env.NODE_ENV !== 'production' &&
+      warn(
+        'Avoid deleting properties on a Vue instance or its root $data ' +
+          '- just set it to null.'
+      )
+    return
+  }
+  if (!hasOwn(target, key)) {
+    return 
+  }
+  delete target[key]
+  if (!ob) {
+    return
+  }
+  ob.dep.notify()
 }
 
 /**

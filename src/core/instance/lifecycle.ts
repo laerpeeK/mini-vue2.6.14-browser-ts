@@ -1,6 +1,7 @@
 import type { Component } from '@/types/component'
 import { pushTarget, popTarget } from '../observer/dep';
 
+export let isUpdatingChildComponent: boolean = false
 export function initLifecycle(vm: Component) {
   const options = vm.$options
 

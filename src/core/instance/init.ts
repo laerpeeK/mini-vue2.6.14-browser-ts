@@ -53,7 +53,6 @@ export function initMixin(Vue: typeof Component) {
     initState(vm)
     // initProvide(vm) // resolve provide after data/props
     callHook(vm, 'created')
-    debugger
   }
 }
 

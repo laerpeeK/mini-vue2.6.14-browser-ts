@@ -4,12 +4,11 @@ import type { SimpleSet } from '../util/env'
 import { _Set as Set } from '../util/env'
 import { queueWatcher } from './scheduler'
 import { pushTarget, popTarget } from './dep'
-import { noop, isObject } from '../../shared/util'
+import { noop, isObject, remove } from '../../shared/util';
 import { warn } from '../util/debug'
 import { parsePath } from '../util/lang'
 import { handleError, invokeWithErrorHandling } from '../util/error';
 import { traverse } from './traverse'
-
 
 let uid = 0
 
@@ -45,7 +44,8 @@ export default class Watcher {
     options?: WatcherOptions | null
   ) {
     this.vm = vm
-
+    vm._watchers.push(this)
+    
     if (options) {
       this.lazy = !!options.lazy
       this.sync = !!options.sync
@@ -189,5 +189,43 @@ export default class Watcher {
     this.deps = this.newDeps
     this.newDeps = tmp
     this.newDeps.length = 0
+  }
+
+  /**
+   * Evaluate the value of the watcher
+   * This only gets called for watchers
+   */
+  evaluate() {
+    this.value = this.get()
+    this.dirty = false
+  }
+
+  /**
+   * Depend on all deps collected by this watcher
+   */
+  depend() {
+    let i = this.deps.length
+    while (i--) {
+      this.deps[i].depend()
+    }
+  }
+
+  /**
+   * Remove self from all dependencies' subscriber list.
+   */
+  teardown() {
+    if (this.active) {
+      // remove self from vm's watcher list
+      // this is a somewhat expensive operation so we skip it
+      // if the wm is being destroyed
+      if (this.vm && !this.vm?._isBeingDestroyed) {
+        remove(this.vm._watchers, this)
+      }
+      let i = this.deps.length
+      while (i--) {
+        this.deps[i].removeSub(this)
+      }
+      this.active = false
+    }
   }
 }

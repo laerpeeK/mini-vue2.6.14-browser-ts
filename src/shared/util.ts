@@ -126,7 +126,7 @@ export function isFalse(v: any): boolean {
 /**
  * Check if value is primitive.
  */
- export function isPrimitive(value: any): boolean {
+export function isPrimitive(value: any): boolean {
   return (
     typeof value === 'string' ||
     typeof value === 'number' ||
@@ -139,7 +139,7 @@ export function isFalse(v: any): boolean {
 /**
  * Check if val is a valid array index.
  */
- export function isValidArrayIndex(val: any): boolean {
+export function isValidArrayIndex(val: any): boolean {
   const n = parseFloat(String(val))
   return n >= 0 && Math.floor(n) === n && isFinite(val)
 }
@@ -179,6 +179,46 @@ export function isPromise(val: any): val is Promise<any> {
  * objects from primitive values when we know the value
  * is a JSON-compliant type.
  */
- export function isObject(obj: any): boolean {
+export function isObject(obj: any): boolean {
   return obj !== null && typeof obj === 'object'
 }
+
+/**
+ * Create a cached version of a pure function.
+ */
+export function cached<R>(fn: (str: string) => R): (sr: string) => R {
+  const cache: Record<string, R> = Object.create(null)
+  return function cachedFn(str: string) {
+    const hit = cache[str]
+    return hit || (cache[str] = fn(str))
+  }
+}
+
+
+const camelizeRE = /-(\w)/g
+/**
+ * Camelize a hyphen-delimited string.
+ */
+export const camelize = cached((str: string): string => {
+  return str.replace(camelizeRE, (_, c) => (c ? c.toUpperCase() : ''))
+})
+
+/**
+ * Capitalize a string.
+ */
+ export const capitalize = cached((str: string): string => {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+})
+
+const hyphenateRE = /\B([A-Z])/g
+/**
+ * Hyphenate a camelCase string.
+ */
+export const hyphenate = cached((str: string): string => {
+  return str.replace(hyphenateRE, '-$1').toLowerCase()
+})
+
+/**
+ * Check if an attribute is a reserved attribute.
+ */
+ export const isReservedAttribute = makeMap('key,ref,slot,slot-scope,is')

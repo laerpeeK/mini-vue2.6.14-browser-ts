@@ -3,7 +3,7 @@ import { Component } from '@/types/component'
 import { ComponentOptions } from '@/types/options'
 import { unicodeRegExp } from './lang'
 import { warn } from './debug'
-import { hasSymbol } from './env'
+import { hasSymbol, nativeWatch } from './env'
 import {
   isBuiltInTag,
   hasOwn,
@@ -12,6 +12,7 @@ import {
   extend,
 } from '@/shared/util'
 import { set } from '@/core/observer'
+import { isArray, camelize } from '../../shared/util'
 
 /**
  * Option overwriting strategies are functions that handle
@@ -21,23 +22,66 @@ import { set } from '@/core/observer'
 const strats = config.optionMergeStrategies
 
 /**
- * Other object hashes.
+ * Watchers
+ *
+ * Watchers hashes should not overwrite one
+ * another, so we merge them as arrays.
  */
-strats.methods = function (
-  parentVal: Object | null,
-  childVal: Object | null,
+strats.watch = function (
+  parentVal: Record<string, any> | null,
+  childVal: Record<string, any> | null,
   vm: Component | null,
   key: string
 ) {
-  if (childVal && process.env.NODE_ENV !== 'production') {
+  // work around Firefox's Object.prototype.watch...
+  // @ts-expect-error work around
+  if (parentVal === nativeWatch) parentVal = undefined
+  // @ts-expect-error work around
+  if (childVal === nativeWatch) childVal = undefined
+
+  if (!childVal) return Object.create(parentVal || null)
+  if (process.env.NODE_ENV !== 'production') {
     assertObjectType(key, childVal, vm)
   }
   if (!parentVal) return childVal
-  const ret = Object.create(null)
+  const ret = {}
   extend(ret, parentVal)
-  if (childVal) extend(ret, childVal)
+  for (const key in childVal) {
+    let parent = ret[key]
+    const child = childVal[key]
+    if (parent && !Array.isArray(parent)) {
+      parent = [parent]
+    }
+    ret[key] = parent
+      ? parent.concat(child)
+      : Array.isArray(child)
+      ? child
+      : [child]
+  }
   return ret
 }
+
+/**
+ * Other object hashes.
+ */
+strats.props =
+  strats.methods =
+  strats.computed =
+    function (
+      parentVal: Object | null,
+      childVal: Object | null,
+      vm: Component | null,
+      key: string
+    ) {
+      if (childVal && process.env.NODE_ENV !== 'production') {
+        assertObjectType(key, childVal, vm)
+      }
+      if (!parentVal) return childVal
+      const ret = Object.create(null)
+      extend(ret, parentVal)
+      if (childVal) extend(ret, childVal)
+      return ret
+    }
 
 /**
  * Helper that recursively merges two data objects together.
@@ -161,6 +205,42 @@ export function validateComponentName(name: string) {
 }
 
 /**
+ * Ensure all props options syntax are normalized into the
+ * Object-based format.
+ */
+function normalizeProps(options: Record<string, any>, vm?: Component | null) {
+  const props = options.props
+  if (!props) return
+  const res: Record<string, any> = {}
+  let i, val, name
+  if (isArray(props)) {
+    i = props.length
+    while (i--) {
+      val = props[i]
+      if (typeof val === 'string') {
+        name = camelize(val)
+        res[name] = { type: null }
+      } else if (process.env.NODE_ENV !== 'production') {
+        warn('props must be strings when using array syntax.')
+      }
+    }
+  } else if (isPlainObject(props)) {
+    for (const key in props) {
+      val = props[key]
+      name = camelize(key)
+      res[name] = isPlainObject(val) ? val : { type: val }
+    }
+  } else if (process.env.NODE_ENV !== 'production') {
+    warn(
+      `Invalid value for option "props": expected an Array or an Object, ` +
+        `but got ${toRawType(props)}.`,
+      vm
+    )
+  }
+  options.props = res
+}
+
+/**
  * Merge two option objects into a new one.
  * Core utility used in both instantiation and inheritance.
  */
@@ -177,6 +257,8 @@ export function mergeOptions(
     // @ts-expect-error
     child = child.options
   }
+
+  normalizeProps(child, vm)
 
   const options: ComponentOptions = {} as any
   let key
@@ -198,6 +280,10 @@ export function mergeOptions(
   return options
 }
 
+/**
+ * jack
+ * warn message when type of value is no  PlainObject
+ */
 function assertObjectType(name: string, value: any, vm: Component | null) {
   if (!isPlainObject(value)) {
     warn(
