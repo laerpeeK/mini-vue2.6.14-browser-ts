@@ -17,6 +17,7 @@ export interface WatcherOptions {
   sync?: boolean
   user?: boolean
   deep?: boolean
+  before?: Function
 }
 
 export default class Watcher {
@@ -36,14 +37,19 @@ export default class Watcher {
   user: boolean
   deep: boolean
   cb: Function
+  before?: Function
 
   constructor(
     vm: Component,
     expOrFn: string | Function,
     cb: Function,
-    options?: WatcherOptions | null
+    options?: WatcherOptions | null,
+    isRenderWatcher?: boolean
   ) {
     this.vm = vm
+    if (isRenderWatcher) {
+      vm._watcher = this
+    }
     vm._watchers.push(this)
     
     if (options) {
@@ -51,6 +57,7 @@ export default class Watcher {
       this.sync = !!options.sync
       this.user = !!options.user
       this.deep = !!options.deep
+      this.before  = options.before
     } else {
       this.deep = this.user = this.lazy = this.sync = false
     }

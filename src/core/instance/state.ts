@@ -250,7 +250,7 @@ function initMethods(vm: Component, methods: Object) {
 }
 
 function initData(vm: Component) {
-  let data = vm.$options.data
+  let data: any = vm.$options.data
   data = vm._data = typeof data === 'function' ? getData(data, vm) : data || {}
   if (!isPlainObject(data)) {
     data = {}
@@ -341,7 +341,6 @@ export function stateMixin(Vue: typeof Component) {
     }
   }
 
-  // https://v2.cn.vuejs.org/v2/api
   Object.defineProperty(Vue.prototype, '$data', dataDef)
   Object.defineProperty(Vue.prototype, '$props', propsDef)
 

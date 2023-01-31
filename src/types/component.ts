@@ -1,5 +1,6 @@
 import type { ComponentOptions } from './options'
 import type Watcher from '@/core/observer/watcher'
+import type VNode from '../core/vdom/vnode'
 export declare class Component {
   constructor(options?: any)
   // constructor infomation
@@ -22,10 +23,12 @@ export declare class Component {
   _hasHookEvent: boolean
   _data: Record<string, any>
   _props: Record<string, any>
-  _computedWatchers: { [key: string]: Watcher}
+  _computedWatchers: { [key: string]: Watcher }
   _watchers: Array<Watcher>
+  _name: string // this only exists in dev mode
 
   // public properties
+  $el: any // so that we can attach __vue__ to it
   $root: Component
   $options: ComponentOptions
   $parent: Component | undefined
@@ -35,9 +38,18 @@ export declare class Component {
   }
   $data: Record<string, any>
   $props: Record<string, any>
-  $watch: (expOrFn: string | (() => any), cb: Function, options?: Record<string, any>) => Function
-
+  $watch: (
+    expOrFn: string | (() => any),
+    cb: Function,
+    options?: Record<string, any>
+  ) => Function
+  $vnode: VNode // the placeholder node for the component in parent's render tree
+  
   // public methods
+  $mount: (
+    el: Element | string,
+    hydrating?: boolean
+  ) => Component & { [key: string]: any }
   $set: <T>(
     target: Record<string, any> | Array<T>,
     key: string | number,
@@ -45,9 +57,13 @@ export declare class Component {
   ) => T
   $delete: <T>(
     target: Record<string, any> | Array<T>,
-    key: string | number,
+    key: string | number
   ) => void
 
   // lifecycle
   _init: Function
+  _update: (vnode: VNode, hydrating?: boolean) => void
+
+  // rendering
+  _render: () => VNode
 }

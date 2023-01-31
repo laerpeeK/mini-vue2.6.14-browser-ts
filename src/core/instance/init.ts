@@ -1,10 +1,11 @@
 import type { Component } from '@/types/component'
 import config from '@/core/config'
-import { mark } from '../util/perf'
+import { mark, measure } from '../util/perf';
 import { mergeOptions } from '../util/options'
 import { initProxy } from './proxy'
 import { initLifecycle, callHook } from './lifecycle';
 import { initState } from './state'
+import { formatComponentName } from '../util/debug'
 
 let uid = 0
 
@@ -15,11 +16,11 @@ export function initMixin(Vue: typeof Component) {
     // a uid
     vm._uid = uid++
 
-    let startTag
+    let startTag, endTag
     // endTag
     if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
       startTag = `vue-perf-start:${vm._uid}`
-      // endTag = `vue-perf-end:${vm._uid}`
+      endTag = `vue-perf-end:${vm._uid}`
       mark(startTag)
     }
 
@@ -53,6 +54,18 @@ export function initMixin(Vue: typeof Component) {
     initState(vm)
     // initProvide(vm) // resolve provide after data/props
     callHook(vm, 'created')
+
+    if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
+      vm._name = formatComponentName(vm, false)
+      mark(endTag)
+      measure(`vue ${vm._name} init`, startTag, endTag)
+      // jack
+      // console.log(performance.getEntriesByName(`vue ${vm._name} init`))
+    }
+    debugger
+    if (vm.$options.el) {
+      vm.$mount(vm.$options.el)
+    }
   }
 }
 

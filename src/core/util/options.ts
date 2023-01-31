@@ -22,6 +22,21 @@ import { isArray, camelize } from '../../shared/util'
 const strats = config.optionMergeStrategies
 
 /**
+ * Options with restrictions
+ */
+if (process.env.NODE_ENV !== 'production') {
+  strats.el = function(parent: any, child: any, vm: any, key: any) {
+    if (!vm) {
+      warn(
+        `option "${key}" can only be used during instance ` +
+          'creation with the `new` keyword.'
+      )
+    }
+    return defaultStrat(parent, child)
+  }
+}
+
+/**
  * Watchers
  *
  * Watchers hashes should not overwrite one
