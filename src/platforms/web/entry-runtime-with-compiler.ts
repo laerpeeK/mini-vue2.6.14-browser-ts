@@ -7,6 +7,10 @@ import { cached } from '@/shared/util'
 import { mark, measure } from '@/core/util/perf'
 import config from '@/core/config'
 import { compileToFunctions } from './compiler'
+import {
+  shouldDecodeNewlines,
+  shouldDecodeNewlinesForHref,
+} from './util/compat'
 
 const idToTemplate = cached((id) => {
   const el = query(id)
@@ -58,11 +62,18 @@ Vue.prototype.$mount = function (
       if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
         mark('compile')
       }
-      
-      debugger
-      const { render, staticRenderFns } = compileToFunctions(template, {
-        outputSourceRange: process.env.NODE_ENV !== 'production'
-      }, this)
+
+      const { render, staticRenderFns } = compileToFunctions(
+        template,
+        {
+          outputSourceRange: process.env.NODE_ENV !== 'production',
+          comments: options.comments,
+          delimiters: options.delimiters,
+          shouldDecodeNewlines,
+          shouldDecodeNewlinesForHref,
+        },
+        this
+      )
       options.render = render
       options.staticRenderFns = staticRenderFns
 

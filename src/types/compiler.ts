@@ -8,9 +8,21 @@ export type CompilerOptions = {
   // web specific
   expectHTML?: boolean // only false for non-web builds
   outputSourceRange?: boolean
+  isPreTag?: (tag: string) => boolean // check if a tag match pre
+  mustUseProp?: (tag: string, type: string | null, name: string) => boolean // check if an attribute should be bound as a property
+  isReservedTag?: (tag: string) => boolean | undefined // check if a tag is a native for the platform
+  getTagNamespace?: (tag: string) => string | undefined // check the namespace for a tag
+  isUnaryTag?: (tag: string) => boolean | undefined // check if a tag is unary for the platform
+  canBeLeftOpenTag?: (tag: string) => boolean | undefined // check if a tag can be left opened
+  shouldDecodeNewlines?: boolean
+  shouldDecodeNewlinesForHref?: boolean 
+  shouldKeepComment?: boolean
+  preserveWhitespace?: boolean // preserve whitespace between elements? (Deprecated)
+  whitespace?: 'preserve' | 'condense' // whitespace handling strategy
 
   // runtime user-configurable
   delimiters?: [string, string] // template delimiters
+  comments?: boolean // preserve comments in template
 }
 
 export type CompiledResult = {
@@ -21,9 +33,37 @@ export type CompiledResult = {
   tips?: Array<string | WarningMessage>
 }
 
-export type ASTElement = {}
+export type ASTElement = {
+  type: 1
+  tag: string
+  attrsList: Array<ASTAttr>
+  attrsMap: {[key: string]: any}
+  rawAttrsMap: { [key: string]: ASTAttr }
+  parent: ASTElement | void
+  children: Array<ASTNode>
 
-export type ASTNode = ASTElement
+  start?: number
+  end?: number
+  attrs?: Array<ASTAttr>
+  forbidden?: true
+  plain?: boolean
+  pre?: true
+  ns?: string
+
+  processed?: true
+}
+
+export type ASTExpression = {
+  type: 2
+  expression: string
+}
+
+export type ASTText = {
+  type: 3
+  text: string
+}
+
+export type ASTNode = ASTElement | ASTExpression | ASTText
 
 export type WarningMessage = {
   msg: string
@@ -41,7 +81,7 @@ export type CompiledFunctionResult = {
 
 export type Compile = (
   template: string,
-  options?: CompilerOptions
+  options: CompilerOptions
 ) => CompiledResult
 
 export type CompileToFunctions = (
@@ -54,4 +94,12 @@ export type CompileToFunctions = (
 export type createCompiler = (baseOptions: CompilerOptions) => {
   compile: Compile
   compileToFunctions: CompileToFunctions
+}
+
+export type ASTAttr = {
+  name: string
+  value: any
+  dynamic?: boolean
+  start?: number
+  end?: number
 }

@@ -65,9 +65,11 @@ export function createCompilerCreator(baseCompile: Compile): createCompiler {
       finalOptions.warn = warn
 
       const compiled = baseCompile(template.trim(), finalOptions)
+      
       if (process.env.NODE_ENV !== 'production') {
         detectErrors(compiled.ast, warn)
       }
+
       compiled.errors = errors
       compiled.tips = tips
       return compiled

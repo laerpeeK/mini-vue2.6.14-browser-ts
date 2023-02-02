@@ -62,7 +62,7 @@ export function initMixin(Vue: typeof Component) {
       // jack
       // console.log(performance.getEntriesByName(`vue ${vm._name} init`))
     }
-    debugger
+    
     if (vm.$options.el) {
       vm.$mount(vm.$options.el)
     }

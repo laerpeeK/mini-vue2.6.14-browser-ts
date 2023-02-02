@@ -13,14 +13,14 @@
     "noImplicitAny": false, // 在表达式和声明上有隐含的any类型时报错
     "noImplicitThis": false, // 当this表达式的值为any类型时，生成一个错误
 
-    "noUnusedLocals": true, // 若有未使用的局部变量则抛出错误
+    "noUnusedLocals": false, // 若有未使用的局部变量则抛出错误
     "experimentalDecorators": true, // 启用实验性的ES装饰器
     "resolveJsonModule": true, // 允许在 TypeScript 模块中导入 JSON 文件
     "esModuleInterop": true, // Typescript对于import的转译规则发生一些变化，处理default在esm cjs的兼容问题
     "removeComments": false, // 删除所有注释， 除了以/!*开头的版权信息
     "jsx": "preserve", //  https://www.typescriptlang.org/docs/handbook/jsx.html#basic-usage
     "lib": ["esnext", "dom"], // 编译过程中需要引入的库文件的列表
-    "types": ["node"], // 要包含的类型声明文件名列表
+    "types": ["node", "he"], // 要包含的类型声明文件名列表
     "paths": { // 模块名到基于 baseUrl的路径映射的列表
       "@/*": ["src/*"],
       "compiler/*": ["src/compiler/*"],

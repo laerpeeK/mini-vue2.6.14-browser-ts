@@ -12,3 +12,5 @@ props: {'maxLength': {
 因此，如果想要在watch根据newVal, oldVal进行判断，尽量监听到确切属性。比如监听'person.name','color.detail.sale'
 
 3. compiler的类型约束相比于Vue2.7 进行了更一步的类型收窄
+
+4. compiler isPreTag类型错误
