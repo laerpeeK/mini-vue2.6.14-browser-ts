@@ -10,7 +10,7 @@
  */
 import { unicodeRegExp } from '@/core/util/lang'
 import { CompilerOptions, ASTAttr } from '@/types/compiler'
-import { isPlainObject, no } from '../../shared/util'
+import { isPlainObject, no, makeMap } from '../../shared/util'
 import { isNonPhrasingTag } from '@/platforms/web/compiler/util'
 
 // Regular Expressions for parsing tags and attributes
@@ -42,6 +42,9 @@ const encodedAttr = /&(?:lt|gt|quot|amp|#39);/g
 const encodedAttrWithNewLines = /&(?:lt|gt|quot|amp|#39|#10|#9);/g
 
 // #5992
+const isIgnoreNewlineTag = makeMap('pre,textarea', true)
+const shouldIgnoreFirstNewline = (tag, html) =>
+  tag && isIgnoreNewlineTag(tag) && html[0] === '\n'
 function decodeAttr(value, shouldDecodeNewlines) {
   const re = shouldDecodeNewlines ? encodedAttrWithNewLines : encodedAttr
   return value.replace(re, (match) => decodingMap[match])
@@ -122,9 +125,9 @@ export function parseHTML(html, options: HTMLParserOptions) {
         const startTagMatch = parseStartTag()
         if (startTagMatch) {
           handleStartTag(startTagMatch)
-          // if (shouldIgnoreFirstNewline(startTagMatch.tagName, html)) {
-          //   advance(1)
-          // }
+          if (shouldIgnoreFirstNewline(startTagMatch.tagName, html)) {
+            advance(1)
+          }
           continue
         }
       }
@@ -140,14 +143,13 @@ export function parseHTML(html, options: HTMLParserOptions) {
         ) {
           // < in plain text, be forgiving and treat it as text
           next = rest.indexOf('<', 1)
-          if (next <0) break
+          if (next < 0) break
           textEnd += next
           rest = html.slice(textEnd)
         }
         text = html.substring(0, textEnd)
-        debugger
       }
-      
+
       if (textEnd < 0) {
         text = html
       }
@@ -159,8 +161,9 @@ export function parseHTML(html, options: HTMLParserOptions) {
       if (options.chars && text) {
         options.chars(text, index - text.length, index)
       }
+    } else {
+      debugger
     }
-    break
   }
   return last
 
@@ -169,7 +172,46 @@ export function parseHTML(html, options: HTMLParserOptions) {
     html = html.substring(n)
   }
 
-  function parseEndTag(tagName?: any, start?: any, end?: any) {}
+  function parseEndTag(tagName?: any, start?: any, end?: any) {
+    debugger
+    let pos, lowerCasedTagName
+    if (start == null) start = index
+    if (end == null) end = index
+
+    // Find the closest opened tag of the same type
+    if (tagName) {
+      lowerCasedTagName = tagName.toLowerCase()
+      for (pos = stack.length - 1; pos >= 0; pos--) {
+        if (stack[pos].lowerCasedTag === lowerCasedTagName) {
+          break
+        }
+      }
+    } else {
+      // If no tag name is provided, clean shop
+      pos = 0
+    }
+
+    if (pos >= 0) {
+      // Close all the open elements, up the stack
+      for (let i = stack.length - 1; i >= pos; i--) {
+        if (
+          process.env.NODE_ENV !== 'production' &&
+          (i > pos || !tagName) &&
+          options.warn
+        ) {
+          options.warn(`tag <${stack[i].tag}> has no matching end tag.`, {
+            start: stack[i].start,
+            end: stack[i].end,
+          })
+        }
+        if (options.end) {
+          options.end(stack[i].tag, start, end)
+        }
+      }
+    } else if (lowerCasedTagName === 'br') {
+    } else if (lowerCasedTagName === 'p') {
+    }
+  }
 
   function parseStartTag() {
     // jack list ['<div', 'div', index: n, input: ...]

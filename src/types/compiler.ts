@@ -41,7 +41,7 @@ export type ASTElement = {
   rawAttrsMap: { [key: string]: ASTAttr }
   parent: ASTElement | void
   children: Array<ASTNode>
-
+  dynamicAttrs?: Array<ASTAttr>
   start?: number
   end?: number
   attrs?: Array<ASTAttr>
@@ -49,18 +49,30 @@ export type ASTElement = {
   plain?: boolean
   pre?: true
   ns?: string
-
+  key?: string
+  scopedSlots?: { [name: string]: ASTElement}
   processed?: true
+  hasBidings?: boolean
+  props?: Array<ASTAttr>
+  elseif?: string
+  else?: true
+  slotScope?: string | null
 }
 
 export type ASTExpression = {
   type: 2
   expression: string
+  tokens: Array<string | Object>
+  text: string
+  start?: number
+  end?: number
 }
 
 export type ASTText = {
   type: 3
   text: string
+  start?: number
+  end?: number
 }
 
 export type ASTNode = ASTElement | ASTExpression | ASTText

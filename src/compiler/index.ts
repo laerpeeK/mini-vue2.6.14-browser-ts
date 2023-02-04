@@ -9,6 +9,7 @@ export const createCompiler = createCompilerCreator(function baseCompile(
   options: CompilerOptions
 ): CompiledResult {
   const ast = parse(template.trim(), options)
+  debugger
   const render = 'return render'
   const staticRenderFns = []
   return {

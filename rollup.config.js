@@ -4,7 +4,7 @@ import resolve from '@rollup/plugin-node-resolve'
 import alias from '@rollup/plugin-alias'
 import injectProcessEnv from 'rollup-plugin-inject-process-env'
 import typescript from 'rollup-plugin-typescript2'
-import commonjs from '@rollup/plugin-commonjs'
+// import commonjs from '@rollup/plugin-commonjs'
 
 export default {
   input: './src/index.ts',
@@ -21,7 +21,7 @@ export default {
         '@': path.resolve(__dirname, './src')
       }
     }),
-    commonjs(),
+    // commonjs(),
     typescript({
       exclude: "node_modules/**"
     }),
@@ -30,7 +30,9 @@ export default {
     }),
     resolve(),
     injectProcessEnv({
-      NODE_ENV: 'development'
+      NODE_ENV: 'development',
+      VBIND_PROP_SHORTHAND: false,
+      NEW_SLOT_SYNTAX: true
     })
   ],
 }

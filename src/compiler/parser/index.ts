@@ -1,13 +1,16 @@
-import he from 'he'
+import { default as he } from './entity-decoder'
 import { ASTElement, CompilerOptions, ASTAttr, ASTNode } from '@/types/compiler'
 import { warn as baseWarn } from '@/core/util/debug'
 import { parseHTML } from './html-parser'
 import { extend, no, cached } from '@/shared/util'
 import { isIE } from '@/core/util/env'
 import { isEdge, isServerRendering } from '../../core/util/env'
-import { getAndRemoveAttr } from '../helper'
+import { getAndRemoveAttr, addAttr, addProp } from '../helper'
 import { parseText } from './text-parser'
 
+export const dirRE = process.env.VBIND_PROP_SHORTHAND
+  ? /^v-|^@|^:|^\.|^#/
+  : /^v-|^@|^:|^#/
 export const forAliasRE = /([\s\S]*?)\s+(?:in|of)\s+([\s\S]*)/
 export const forIteratorRE = /,([^,\}\]]*)(?:,([^,\}\]]*))?$/
 const stripParensRE = /^\(|\)$/g
@@ -19,9 +22,12 @@ const decodeHTMLCached = cached(he.decode)
 
 // configurable state
 export let warn: any
+let transforms
 let delimiters
 let platformGetTagNamespace
+let platformMustUseProp
 let preTransforms
+let postTransforms
 let platformIsPreTag
 
 export function createASTElement(
@@ -42,13 +48,19 @@ export function createASTElement(
 
 export function parse(template: string, options: CompilerOptions) {
   warn = options.warn || baseWarn
+
   platformIsPreTag = options.isPreTag || no
+  platformMustUseProp = options.mustUseProp || no
   platformGetTagNamespace = options.getTagNamespace || no
   delimiters = options.delimiters
 
+  transforms = []
+  postTransforms = []
+  
   const stack: any[] = []
   const preserveWhitespace = options.preserveWhitespace !== false
   const whitespaceOption = options.whitespace
+
   let root
   let currentParent
   let inVPre = false
@@ -76,9 +88,43 @@ export function parse(template: string, options: CompilerOptions) {
     }
   }
 
-  function closeElement(element: ASTElement) {
-    // jack will
+  function closeElement(element) {
     trimEndingWhitespace(element)
+    if (!inVPre && !element.processed) {
+      element = processElement(element, options)
+    }
+    // tree management
+    if (!stack.length && element !== root) {
+      // jack will
+      // allow root elements with v-if, v-else-if and v-else
+    }
+    if (currentParent && !element.forbidden) {
+      if (element.elseif || element.else) {
+        // jack will
+      } else {
+        if (element.slotScope) {
+        }
+        currentParent.children.push(element)
+        element.parent = currentParent
+      }
+    }
+
+    // final children cleanup
+    // filter out scoped slots
+    element.children = element.children.filter((c) => !c.slotScope)
+    // remove trailing whitespace node again
+    trimEndingWhitespace(element)
+    // check pre state
+    if (element.pre) {
+      inVPre = false
+    }
+    if (platformIsPreTag(element.tag)) {
+      inPre = false
+    }
+    // apply post-transforms
+    for (let i = 0; i < postTransforms.length; i++) {
+      postTransforms[i](element, options)
+    }
   }
 
   function checkRootConstraints(el: ASTElement) {
@@ -202,7 +248,16 @@ export function parse(template: string, options: CompilerOptions) {
         closeElement(element)
       }
     },
-    end(tag, start, end) {},
+    end(tag, start, end) {
+      const element = stack[stack.length - 1]
+      // pop stack
+      stack.length -= 1
+      currentParent = stack[stack.length - 1]
+      if (process.env.NODE_ENV !== 'production' && options.outputSourceRange) {
+        element.end = end
+      }
+      closeElement(element)
+    },
     chars(text: string, start?: number, end?: number) {
       debugger
       if (!currentParent) {
@@ -252,7 +307,31 @@ export function parse(template: string, options: CompilerOptions) {
         let res
         let child: ASTNode | undefined
         if (!inVPre && text !== ' ' && (res = parseText(text, delimiters))) {
-          
+          child = {
+            type: 2,
+            expression: res.expression,
+            tokens: res.tokens,
+            text,
+          }
+        } else if (
+          text !== ' ' ||
+          !children.length ||
+          children[children.length - 1].text !== ' '
+        ) {
+          child = {
+            type: 3,
+            text,
+          }
+        }
+        if (child) {
+          if (
+            process.env.NODE_ENV !== 'production' &&
+            options.outputSourceRange
+          ) {
+            child.start = start
+            child.end = end
+          }
+          children.push(child)
         }
       }
     },
@@ -260,6 +339,73 @@ export function parse(template: string, options: CompilerOptions) {
   })
 
   return root
+}
+
+function processAttrs(el) {
+  debugger
+  const list = el.attrsList
+  let i, l, name, rawName, value, modifiers, syncGen, isDynamic
+  for (i = 0, l = list.length; i < l; i++) {
+    name = rawName = list[i].name
+    value = list[i].value
+    if (dirRE.test(name)) {
+      // jack will
+      el.hasBidngs = true
+    } else {
+      // literal attribute
+      if (process.env.NODE_ENV !== 'production') {
+        const res = parseText(value, delimiters)
+        if (res) {
+          warn(
+            `${name}="${value}": ` +
+              'Interpolation inside attributes has been removed. ' +
+              'Use v-bind or the colon shorthand instead. For example, ' +
+              'instead of <div id="{{ val }}">, use <div :id="val">.',
+            list[i]
+          )
+        }
+      }
+      addAttr(el, name, JSON.stringify(value), list[i])
+      // #6887 firefox doesn't update muted state if set via attribute
+      // even immediately after element creation
+      if (
+        !el.component &&
+        name === 'muted' &&
+        platformMustUseProp(el.tag, el.attrsMap.type, name)
+      ) {
+        addProp(el, name, 'true', list[i])
+      }
+    }
+  }
+}
+
+function processComponent(el) {}
+
+function processSlotOutlet(el) {}
+
+function processSlotContent(el) {}
+
+function processRef(el) {}
+
+function processKey(el) {}
+
+export function processElement(element: ASTElement, options: CompilerOptions) {
+  processKey(element)
+
+  // determine whether this is a plain element after
+  // removing structural attributes
+  element.plain =
+    !element.key && !element.scopedSlots && !element.attrsList.length
+
+  processRef(element)
+  processSlotContent(element)
+  processSlotOutlet(element)
+  processComponent(element)
+  for (let i = 0; i < transforms.length; i++) {
+    element = transforms[i](element, options) || element
+  }
+  processAttrs(element)
+  return element
 }
 
 // for script (e.g. type="x/template") or style, do not decode content
