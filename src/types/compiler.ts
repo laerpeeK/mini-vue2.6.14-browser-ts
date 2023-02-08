@@ -4,7 +4,8 @@ export type CompilerOptions = {
   warn?: Function // allow customizing warning in different enviroments; e.g. node
   modules?: Array<ModuleOptions> // platform specific modules; e.g. style; class
   directives?: { [key: string]: Function } // platform specfic directives
-
+  optimize?: boolean // optimize static content?
+  staticKeys?: string // a list of AST properties to be considered static; for optimization
   // web specific
   expectHTML?: boolean // only false for non-web builds
   outputSourceRange?: boolean
@@ -33,6 +34,10 @@ export type CompiledResult = {
   tips?: Array<string | WarningMessage>
 }
 
+export type ASTIfCondition = { exp: string | null; block: ASTElement }
+export type ASTIfConditions = Array<ASTIfCondition>
+
+
 export type ASTElement = {
   type: 1
   tag: string
@@ -52,11 +57,18 @@ export type ASTElement = {
   key?: string
   scopedSlots?: { [name: string]: ASTElement}
   processed?: true
-  hasBidings?: boolean
+  hasBindings?: boolean
   props?: Array<ASTAttr>
   elseif?: string
   else?: true
   slotScope?: string | null
+  static?: boolean
+  staticRoot?: boolean
+  if?: string
+  for?: string
+  ifConditions?: ASTIfConditions
+  once?: true
+  staticInFor?: boolean
 }
 
 export type ASTExpression = {
@@ -66,6 +78,7 @@ export type ASTExpression = {
   text: string
   start?: number
   end?: number
+  static?: boolean
 }
 
 export type ASTText = {
@@ -73,6 +86,7 @@ export type ASTText = {
   text: string
   start?: number
   end?: number
+  static?: boolean
 }
 
 export type ASTNode = ASTElement | ASTExpression | ASTText

@@ -70,7 +70,7 @@ Vue.prototype.$mount = function (
           comments: options.comments,
           delimiters: options.delimiters,
           shouldDecodeNewlines,
-          shouldDecodeNewlinesForHref,
+          shouldDecodeNewlinesForHref
         },
         this
       )
