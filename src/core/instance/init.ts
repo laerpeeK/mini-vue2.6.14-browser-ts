@@ -1,12 +1,12 @@
 import type { Component } from '@/types/component'
 import config from '@/core/config'
-import { mark, measure } from '../util/perf';
+import { mark, measure } from '../util/perf'
 import { mergeOptions } from '../util/options'
 import { initProxy } from './proxy'
-import { initLifecycle, callHook } from './lifecycle';
+import { initLifecycle, callHook } from './lifecycle'
 import { initState } from './state'
 import { formatComponentName } from '../util/debug'
-
+import { initRender } from './render'
 let uid = 0
 
 export function initMixin(Vue: typeof Component) {
@@ -48,7 +48,7 @@ export function initMixin(Vue: typeof Component) {
     vm._self = vm
     initLifecycle(vm)
     // initEvents(vm)
-    // initRender(vm)
+    initRender(vm)
     callHook(vm, 'beforeCreate')
     // initInjections(vm) // resolve injections before data/props
     initState(vm)
@@ -62,7 +62,7 @@ export function initMixin(Vue: typeof Component) {
       // jack
       // console.log(performance.getEntriesByName(`vue ${vm._name} init`))
     }
-    
+
     if (vm.$options.el) {
       vm.$mount(vm.$options.el)
     }

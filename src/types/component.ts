@@ -1,6 +1,7 @@
 import type { ComponentOptions } from './options'
 import type Watcher from '@/core/observer/watcher'
 import type VNode from '../core/vdom/vnode'
+import { VNodeChildren, VNodeData } from './vnode'
 export declare class Component {
   constructor(options?: any)
   // constructor infomation
@@ -26,7 +27,8 @@ export declare class Component {
   _computedWatchers: { [key: string]: Watcher }
   _watchers: Array<Watcher>
   _name: string // this only exists in dev mode
-
+  _vnode?: VNode | null // self root node
+  _staticTrees?: Array<VNode> | null // v-once cached trees
   // public properties
   $el: any // so that we can attach __vue__ to it
   $root: Component
@@ -59,6 +61,12 @@ export declare class Component {
     target: Record<string, any> | Array<T>,
     key: string | number
   ) => void
+  $createElement: (
+    tag?: string | Component,
+    data?: Record<string, any>,
+    children?: VNodeChildren
+  ) => VNode
+  $nextTick: (fn: (...args: any[]) => any) => void | Promise<any>
 
   // lifecycle
   _init: Function
@@ -66,4 +74,7 @@ export declare class Component {
 
   // rendering
   _render: () => VNode
+
+  // _c is internal that accepts `normalizationType` optimization hint
+  _c: (vnode?: VNode, data?: VNodeData, children?: VNodeChildren, normalizationType?: number) => VNode | void
 }

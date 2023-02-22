@@ -259,7 +259,6 @@ export function parse(template: string, options: CompilerOptions) {
       closeElement(element)
     },
     chars(text: string, start?: number, end?: number) {
-      debugger
       if (!currentParent) {
         if (process.env.NODE_ENV !== 'production') {
           if (text === template) {
@@ -342,7 +341,6 @@ export function parse(template: string, options: CompilerOptions) {
 }
 
 function processAttrs(el) {
-  debugger
   const list = el.attrsList
   let i, l, name, rawName, value, modifiers, syncGen, isDynamic
   for (i = 0, l = list.length; i < l; i++) {

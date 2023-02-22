@@ -16,7 +16,7 @@ export type CompilerOptions = {
   isUnaryTag?: (tag: string) => boolean | undefined // check if a tag is unary for the platform
   canBeLeftOpenTag?: (tag: string) => boolean | undefined // check if a tag can be left opened
   shouldDecodeNewlines?: boolean
-  shouldDecodeNewlinesForHref?: boolean 
+  shouldDecodeNewlinesForHref?: boolean
   shouldKeepComment?: boolean
   preserveWhitespace?: boolean // preserve whitespace between elements? (Deprecated)
   whitespace?: 'preserve' | 'condense' // whitespace handling strategy
@@ -24,6 +24,9 @@ export type CompilerOptions = {
   // runtime user-configurable
   delimiters?: [string, string] // template delimiters
   comments?: boolean // preserve comments in template
+
+  // SFC analyzed script bindings from `compileScript()`
+  bindings?: Function
 }
 
 export type CompiledResult = {
@@ -37,12 +40,11 @@ export type CompiledResult = {
 export type ASTIfCondition = { exp: string | null; block: ASTElement }
 export type ASTIfConditions = Array<ASTIfCondition>
 
-
 export type ASTElement = {
   type: 1
   tag: string
   attrsList: Array<ASTAttr>
-  attrsMap: {[key: string]: any}
+  attrsMap: { [key: string]: any }
   rawAttrsMap: { [key: string]: ASTAttr }
   parent: ASTElement | void
   children: Array<ASTNode>
@@ -55,7 +57,7 @@ export type ASTElement = {
   pre?: true
   ns?: string
   key?: string
-  scopedSlots?: { [name: string]: ASTElement}
+  scopedSlots?: { [name: string]: ASTElement }
   processed?: true
   hasBindings?: boolean
   props?: Array<ASTAttr>
@@ -69,6 +71,9 @@ export type ASTElement = {
   ifConditions?: ASTIfConditions
   once?: true
   staticInFor?: boolean
+  staticProcessed?: boolean
+  component?: string
+  inlineTemplate?: true
 }
 
 export type ASTExpression = {
@@ -87,6 +92,7 @@ export type ASTText = {
   start?: number
   end?: number
   static?: boolean
+  isComment?: boolean
 }
 
 export type ASTNode = ASTElement | ASTExpression | ASTText
@@ -98,7 +104,6 @@ export type WarningMessage = {
 }
 
 export type ModuleOptions = {}
-
 
 export type CompiledFunctionResult = {
   render: Function
@@ -115,7 +120,6 @@ export type CompileToFunctions = (
   options?: CompilerOptions,
   vm?: Component
 ) => CompiledFunctionResult
-
 
 export type createCompiler = (baseOptions: CompilerOptions) => {
   compile: Compile

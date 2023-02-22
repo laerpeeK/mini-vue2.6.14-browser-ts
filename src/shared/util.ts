@@ -194,7 +194,6 @@ export function cached<R>(fn: (str: string) => R): (sr: string) => R {
   }
 }
 
-
 const camelizeRE = /-(\w)/g
 /**
  * Camelize a hyphen-delimited string.
@@ -206,7 +205,7 @@ export const camelize = cached((str: string): string => {
 /**
  * Capitalize a string.
  */
- export const capitalize = cached((str: string): string => {
+export const capitalize = cached((str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1)
 })
 
@@ -221,4 +220,19 @@ export const hyphenate = cached((str: string): string => {
 /**
  * Check if an attribute is a reserved attribute.
  */
- export const isReservedAttribute = makeMap('key,ref,slot,slot-scope,is')
+export const isReservedAttribute = makeMap('key,ref,slot,slot-scope,is')
+
+/**
+ * Convert an Array-like object to a real Array.
+ */
+export function toArray(list: any, start?: number): Array<any> {
+  start = start || 0
+  let i = list.length - start
+  const ret: Array<any> = new Array(i)
+  while (i--) {
+    ret[i] = list[i + start]
+  }
+  return ret
+}
+
+export const emptyObject = Object.freeze({})

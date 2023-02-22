@@ -71,7 +71,6 @@ export function parseHTML(html, options: HTMLParserOptions) {
   let index = 0
   let last, lastTag
   while (html) {
-    debugger
     last = html
     // Make sure we're not in a plaintext content element like script/style
     if (!lastTag || !isPlainObject(lastTag)) {
@@ -173,7 +172,6 @@ export function parseHTML(html, options: HTMLParserOptions) {
   }
 
   function parseEndTag(tagName?: any, start?: any, end?: any) {
-    debugger
     let pos, lowerCasedTagName
     if (start == null) start = index
     if (end == null) end = index
