@@ -9,13 +9,13 @@ import {
 } from '@/shared/util'
 import { warn } from '../util/debug'
 import { isReserved } from '../util/lang'
-import Dep, { pushTarget, popTarget } from '../observer/dep'
+import { isServerRendering, nativeWatch } from '../util/env'
 import { handleError, invokeWithErrorHandling } from '../util/error'
+import Dep, { pushTarget, popTarget } from '../observer/dep'
 import { observe, set, del, toggleObserving, defineReactive } from '../observer'
 import { validateProp } from '../util/props'
 import config from '../config'
 import { isUpdatingChildComponent } from './lifecycle'
-import { isServerRendering, nativeWatch } from '../util/env'
 import Watcher from '../observer/watcher'
 
 export function initState(vm: Component) {

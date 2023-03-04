@@ -1,4 +1,10 @@
-import { makeMap } from "@/shared/util"
+import { makeMap } from '@/shared/util'
+import { inBrowser } from '@/core/util/env'
+
+export const namespaceMap = {
+  svg: 'http://www.w3.org/2000/svg',
+  math: 'http://www.w3.org/1998/Math/MathML',
+}
 
 export const isPreTag = (tag?: string): boolean => tag === 'pre'
 
@@ -33,10 +39,35 @@ export function getTagNamespace(tag: string): string | undefined {
   if (isSVG(tag)) {
     return 'svg'
   }
-  
+
   // basic support for MathML
   // note it doesn't support other MathML elements being component roots
   if (tag === 'math') {
     return 'math'
+  }
+}
+
+const unknownElementCache = Object.create(null)
+export function isUnknownElement(tag: string): boolean {
+  if (!inBrowser) {
+    return true
+  }
+
+  if (isReservedTag(tag)) {
+    return false
+  }
+
+  tag = tag.toLowerCase()
+  if (unknownElementCache[tag] != null) {
+    return unknownElementCache[tag]
+  }
+  const el = document.createElement(tag)
+  if (tag.indexOf('-') > -1) {
+    // http://stackoverflow.com/a/28210364/1070244
+    return (unknownElementCache[tag] =
+      el.constructor === window.HTMLUnknownElement ||
+      el.constructor === window.HTMLElement)
+  } else {
+    return (unknownElementCache[tag] = /HTMLUnknownElement/.test(el.toString()))
   }
 }

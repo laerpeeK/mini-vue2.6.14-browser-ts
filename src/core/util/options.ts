@@ -1,4 +1,5 @@
 import config from '../config'
+import { LIFECYCLE_HOOKS } from '@/shared/constant'
 import { Component } from '@/types/component'
 import { ComponentOptions } from '@/types/options'
 import { unicodeRegExp } from './lang'
@@ -12,7 +13,7 @@ import {
   extend,
 } from '@/shared/util'
 import { set } from '@/core/observer'
-import { isArray, camelize } from '../../shared/util'
+import { isArray, camelize } from '@/shared/util'
 
 /**
  * Option overwriting strategies are functions that handle
@@ -22,10 +23,44 @@ import { isArray, camelize } from '../../shared/util'
 const strats = config.optionMergeStrategies
 
 /**
+ * Hooks and props are merged as arrays.
+ */
+
+function mergeHook(
+  parentVal?: Array<Function>,
+  childVal?: Function | Array<Function>
+) {
+  const res = childVal
+    ? parentVal
+      ? parentVal.concat(childVal)
+      : Array.isArray(childVal)
+        ? childVal
+        : [childVal]
+    : parentVal
+  return res
+    ? dedupeHooks(res)
+    : res
+}
+
+function dedupeHooks(hooks: Array<Function>) {
+  const res: Array<Function> = []
+  for (let i = 0; i < hooks.length; i++) {
+    if (res.indexOf(hooks[i]) === -1) {
+      res.push(hooks[i])
+    }
+  }
+  return res
+}
+
+LIFECYCLE_HOOKS.forEach((hook) => {
+  strats[hook] = mergeHook
+})
+
+/**
  * Options with restrictions
  */
 if (process.env.NODE_ENV !== 'production') {
-  strats.el = function(parent: any, child: any, vm: any, key: any) {
+  strats.el = function (parent: any, child: any, vm: any, key: any) {
     if (!vm) {
       warn(
         `option "${key}" can only be used during instance ` +

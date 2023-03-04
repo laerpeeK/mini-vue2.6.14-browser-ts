@@ -1,6 +1,6 @@
-import { isDef, isPrimitive } from '@/shared/util'
 import type { Component } from '@/types/component'
 import type { VNodeData } from '@/types/vnode'
+import { isDef, isPrimitive } from '@/shared/util'
 import { warn } from '../util/debug'
 import VNode, { createEmptyVNode } from './vnode'
 import config from '../config'
@@ -34,7 +34,6 @@ export function _createElement(
   children?: any,
   normalizationType?: number
 ) {
-  debugger
   if (isDef(data) && isDef(data.__ob__)) {
     process.env.NODE_ENV !== 'production' &&
       warn(
@@ -117,5 +116,6 @@ export function _createElement(
     }
     if (isDef(data)) {
     }
+    return vnode
   }
 }

@@ -2,17 +2,18 @@ import type { Component } from '@/types/component'
 import config from '@/core/config'
 import { mark, measure } from '../util/perf'
 import { mergeOptions } from '../util/options'
+import { formatComponentName } from '../util/debug'
 import { initProxy } from './proxy'
 import { initLifecycle, callHook } from './lifecycle'
 import { initState } from './state'
-import { formatComponentName } from '../util/debug'
 import { initRender } from './render'
+import { initEvents } from './events'
+
 let uid = 0
 
 export function initMixin(Vue: typeof Component) {
   Vue.prototype._init = function (options?: Record<string, any>) {
     const vm: Component = this
-
     // a uid
     vm._uid = uid++
 
@@ -47,7 +48,7 @@ export function initMixin(Vue: typeof Component) {
 
     vm._self = vm
     initLifecycle(vm)
-    // initEvents(vm)
+    initEvents(vm)
     initRender(vm)
     callHook(vm, 'beforeCreate')
     // initInjections(vm) // resolve injections before data/props

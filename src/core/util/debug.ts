@@ -1,7 +1,7 @@
-import config from '../config'
-import { Component } from '@/types/component'
+import type { Component } from '@/types/component'
 import { noop, isArray } from '../../shared/util'
 import { getComponentName } from '../vdom/create-component'
+import config from '../config'
 
 export let warn: (msg: string, vm?: Component | null) => void = noop
 export let tip = noop

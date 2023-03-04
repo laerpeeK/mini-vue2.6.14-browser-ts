@@ -29,6 +29,15 @@ export declare class Component {
   _name: string // this only exists in dev mode
   _vnode?: VNode | null // self root node
   _staticTrees?: Array<VNode> | null // v-once cached trees
+  __patch__: (
+    a: Element | VNode | void | null,
+    b: VNode | null,
+    hydrating?: boolean,
+    removeOnly?: boolean,
+    parentElm?: any,
+    refElm?: any
+  ) => any
+
   // public properties
   $el: any // so that we can attach __vue__ to it
   $root: Component
@@ -46,7 +55,7 @@ export declare class Component {
     options?: Record<string, any>
   ) => Function
   $vnode: VNode // the placeholder node for the component in parent's render tree
-  
+
   // public methods
   $mount: (
     el: Element | string,
@@ -76,5 +85,10 @@ export declare class Component {
   _render: () => VNode
 
   // _c is internal that accepts `normalizationType` optimization hint
-  _c: (vnode?: VNode, data?: VNodeData, children?: VNodeChildren, normalizationType?: number) => VNode | void
+  _c: (
+    vnode?: VNode,
+    data?: VNodeData,
+    children?: VNodeChildren,
+    normalizationType?: number
+  ) => VNode | void
 }

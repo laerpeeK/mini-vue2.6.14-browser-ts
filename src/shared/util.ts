@@ -47,6 +47,7 @@ export function hasOwn(obj: Object | Array<any>, key: string): boolean {
 }
 
 const _toString = Object.prototype.toString
+
 /**
  * Strict object type check. Only returns true
  * for plain JavaScript objects.
@@ -235,4 +236,7 @@ export function toArray(list: any, start?: number): Array<any> {
   return ret
 }
 
+/**
+ * return a Readonly object
+ */
 export const emptyObject = Object.freeze({})

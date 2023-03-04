@@ -161,7 +161,7 @@ export function parseHTML(html, options: HTMLParserOptions) {
         options.chars(text, index - text.length, index)
       }
     } else {
-      debugger
+      console.warn('[jack debug]: unfinished')
     }
   }
   return last

@@ -1,7 +1,7 @@
 import type { CompilerOptions } from '@/types/compiler'
 import { isPreTag, isReservedTag, getTagNamespace } from '../util/element'
 import { mustUseProp } from '../util/attrs'
-import { isUnaryTag, canBeLeftOpenTag } from './util';
+import { isUnaryTag, canBeLeftOpenTag } from './util'
 
 export const baseOptions: CompilerOptions = {
   isPreTag,
@@ -10,5 +10,5 @@ export const baseOptions: CompilerOptions = {
   mustUseProp,
   expectHTML: true,
   isUnaryTag,
-  canBeLeftOpenTag
+  canBeLeftOpenTag,
 }

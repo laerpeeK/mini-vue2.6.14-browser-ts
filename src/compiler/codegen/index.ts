@@ -5,7 +5,7 @@ import {
   ASTNode,
   ASTText,
   ASTExpression,
-} from '../../types/compiler'
+} from '@/types/compiler'
 import { warn as baseWarn } from '@/core/util/debug'
 import { no } from '@/shared/util'
 
@@ -89,9 +89,11 @@ export function genText(text: ASTText | ASTExpression): string {
 
 function genNode(node: ASTNode, state: CodegenState): string {
   if (node.type === 1) {
-    return 'debugger'
+    console.warn('[jack debug]: unfinish')
+    return ''
   } else if (node.type === 3 && node.isComment) {
-    return 'debugger'
+    console.warn('[jack debug]: unfinish')
+    return ''
   } else {
     return genText(node)
   }
@@ -159,7 +161,7 @@ export function genElement(el: ASTElement, state: CodegenState) {
   } else {
     let code
     if (el.component) {
-      debugger
+      console.warn('[jack debug]: unfinished')
     } else {
       let data
       const maybeComponent = state.maybeComponent(el)

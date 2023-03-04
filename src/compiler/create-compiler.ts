@@ -1,4 +1,3 @@
-import { extend } from '@/shared/util'
 import type {
   CompilerOptions,
   CompiledResult,
@@ -8,6 +7,7 @@ import type {
 } from '@/types/compiler'
 import { detectErrors } from './error-detector'
 import { createCompileToFunctionFn } from './to-function'
+import { extend } from '@/shared/util'
 
 export function createCompilerCreator(baseCompile: Compile): createCompiler {
   return function createCompiler(baseOptions: CompilerOptions) {

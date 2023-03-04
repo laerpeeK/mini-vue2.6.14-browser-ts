@@ -19,6 +19,7 @@ export function getAndRemoveAttr(
   }
   return val
 }
+
 type Range = { start?: number; end?: number }
 
 export function addProp(

@@ -15,7 +15,6 @@ export const createCompiler = createCompilerCreator(function baseCompile(
     optimize(ast, options)
   }
   const code = generate(ast, options)
-  debugger
   return {
     ast,
     render: code.render,

@@ -65,11 +65,10 @@ export function renderMixin(Vue: typeof Component) {
   }
 
   Vue.prototype._render = function (): VNode {
-    debugger
     const vm: Component = this
     const { render, _parentVNode } = vm.$options
     if (_parentVNode) {
-      debugger
+      console.warn('[jack debug]: unfinished')
     }
 
     // set parent vnode. this allows render functions to have access
@@ -84,8 +83,20 @@ export function renderMixin(Vue: typeof Component) {
       vnode = render.call(vm._renderProxy, vm.$createElement)
     } catch (e: any) {
       handleError(e, vm, 'render')
+      if (process.env.NODE_ENV !== 'production' && vm.$options.renderError) {
+        try {
+          vnode = vm.$options.renderError.call(vm._renderProxy, vm.$createElement, e)
+        } catch (e: any) {
+          handleError(e, vm, `renderError`)
+          vnode = vm._vnode
+        }
+      } else {
+        vnode = vm._vnode
+      }
+    } finally {
+      currentRenderingInstance = null
     }
-
+    vnode.parent = _parentVNode
     return vnode
   }
 }

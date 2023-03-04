@@ -1,13 +1,17 @@
 import type { Component } from '@/types/component'
 import { pushTarget, popTarget } from '../observer/dep'
+import type VNode from '../vdom/vnode'
 import { createEmptyVNode } from '../vdom/vnode'
 import { warn } from '../util/debug'
 import config from '../config'
 import { mark, measure } from '../util/perf'
-import { WatcherOptions } from '../observer/watcher';
-import { noop } from '../../shared/util';
+import { WatcherOptions } from '../observer/watcher'
+import { noop } from '../../shared/util'
 import Watcher from '../observer/watcher'
+import { invokeWithErrorHandling } from '../util/error'
+export let activeInstance: any = null
 export let isUpdatingChildComponent: boolean = false
+
 export function initLifecycle(vm: Component) {
   const options = vm.$options
 
@@ -38,6 +42,30 @@ function isInactiveTree(vm) {
     if (vm._inactive) return true
   }
   return false
+}
+
+export function setActiveInstance(vm: Component) {
+  const prevActiveInstance = activeInstance
+  activeInstance = vm
+  return () => {
+    activeInstance = prevActiveInstance
+  }
+}
+
+export function lifecycleMixin(Vue: typeof Component) {
+  Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
+    const vm: Component = this
+    const prevEl = vm.$el
+    const prevVnode = vm._vnode
+    const restoreActiveInstance = setActiveInstance(vm)
+    vm._vnode = vnode
+    // Vue.prototype.__patch__ is injected in entry points
+    // based on the rendering backend used.
+    if (!prevVnode) {
+      // initial render
+      vm.$el = vm.__patch__(vm.$el, vnode, hydrating, false /* removeOnly */)
+    }
+  }
 }
 
 export function mountComponent(
@@ -94,18 +122,22 @@ export function mountComponent(
     }
   }
 
-  const watcherOptions: WatcherOptions = {
-    before() {
-      if (vm._isMounted && vm._isDestroyed) {
-        callHook(vm, 'beforeUpdate')
-      }
-    }
-  }
-
   // we set this to vm._watcher inside the watcher's constructor
   // since the watcher's initial patch may call $foreUpdate (e.g. inside child
   // component's mounted hook), which relies on vm._watcher being already defined
-  new Watcher(vm, updateComponent, noop, watcherOptions, true)
+  new Watcher(
+    vm,
+    updateComponent,
+    noop,
+    {
+      before() {
+        if (vm._isMounted && vm._isDestroyed) {
+          callHook(vm, 'beforeUpdate')
+        }
+      },
+    },
+    true
+  )
   hydrating = false
 
   // manually mounted instance, call mounted on self
@@ -140,8 +172,10 @@ export function callHook(vm: Component, hook: string) {
   pushTarget()
   const handlers = vm.$options[hook]
   const info = `${hook} hook`
-  console.log('lifecycle: ', info)
   if (handlers) {
+    for (let i = 0, j = handlers.length; i < j; i++) {
+      invokeWithErrorHandling(handlers[i], vm, null, vm, info)
+    }
   }
   if (vm._hasHookEvent) {
   }
