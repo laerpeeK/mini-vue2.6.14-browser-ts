@@ -10,6 +10,8 @@ export interface VNodeData {
   slot?: string
   tag?: string
   attrs?: {[key: string]: any}
+  staticClass?: string
+  class?: any
   [key: string]: any
 }
 
@@ -33,4 +35,5 @@ export type VNodeWithData = VNode & {
   parent?: VNodeWithData
   isRootInsert: boolean
   componentOptions?: VNodeComponentOptions
+  componentInstance?: Component
 }

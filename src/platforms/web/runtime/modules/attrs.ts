@@ -1,5 +1,4 @@
 import { isEdge, isIE, isIE9 } from '@/core/util/env'
-import VNode from '@/core/vdom/vnode'
 
 import { extend, isDef, isUndef, isTrue } from '@/shared/util'
 import { VNodeWithData } from '@/types/vnode'
@@ -35,6 +34,21 @@ function updateAttrs(oldVnode: VNodeWithData, vnode: VNodeWithData) {
     old = oldAttrs[key]
     if (old !== cur) {
       setAttr(elm, key, cur, vnode.data.pre)
+    }
+  }
+
+  // #4391: inIE9, setting type can reset value for input[type=radio]
+  // #6666: IE/Edge forces progress value down to 1 before setting a max
+  if ((isIE || isEdge) && attrs.value !== oldAttrs.value) {
+    setAttr(elm, 'value', attrs.value)
+  }
+  for (key in oldAttrs) {
+    if (isUndef(attrs[key])) {
+      if (isXlink(key)) {
+        elm.removeAttributeNS(xlinkNS, getXlinkProp(key))
+      } else if (!isEnumeratedAttr(key)) {
+        elm.removeAttribute(key)
+      }
     }
   }
 }

@@ -76,6 +76,7 @@ export declare class Component {
     children?: VNodeChildren
   ) => VNode
   $nextTick: (fn: (...args: any[]) => any) => void | Promise<any>
+  $forceUpdate: () => void
 
   // lifecycle
   _init: Function

@@ -34,12 +34,10 @@ function mergeHook(
     ? parentVal
       ? parentVal.concat(childVal)
       : Array.isArray(childVal)
-        ? childVal
-        : [childVal]
+      ? childVal
+      : [childVal]
     : parentVal
-  return res
-    ? dedupeHooks(res)
-    : res
+  return res ? dedupeHooks(res) : res
 }
 
 function dedupeHooks(hooks: Array<Function>) {
@@ -310,6 +308,22 @@ export function mergeOptions(
 
   normalizeProps(child, vm)
 
+  // Apply extends and mixins on the child options.
+  // but only if it is a raw options object that isn't
+  // the result of another mergeOptions call.
+  // Only merged options has the _base property.
+  if (!child._base) {
+    if (child.extends) {
+      parent = mergeOptions(parent, child.extends, vm)
+    }
+
+    if (child.mixins) {
+      for (let i = 0, l = child.mixins.length; i < l; i++) {
+        parent = mergeOptions(parent, child.mixins[i], vm)
+      }
+    }
+  }
+
   const options: ComponentOptions = {} as any
   let key
   for (key in parent) {
@@ -331,7 +345,6 @@ export function mergeOptions(
 }
 
 /**
- * jack
  * warn message when type of value is no  PlainObject
  */
 function assertObjectType(name: string, value: any, vm: Component | null) {

@@ -6,7 +6,7 @@ import { warn } from '@/core/util/debug'
 import { cached } from '@/shared/util'
 import { mark, measure } from '@/core/util/perf'
 import config from '@/core/config'
-import { compileToFunctions } from './compiler'
+import { compile, compileToFunctions } from './compiler'
 import {
   shouldDecodeNewlines,
   shouldDecodeNewlinesForHref,
@@ -99,5 +99,7 @@ function getOuterHTML(el: Element): string {
     return container.innerHTML
   }
 }
+
+Vue.compile = compileToFunctions
 
 export default Vue

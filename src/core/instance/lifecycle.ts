@@ -66,6 +66,13 @@ export function lifecycleMixin(Vue: typeof Component) {
       vm.$el = vm.__patch__(vm.$el, vnode, hydrating, false /* removeOnly */)
     }
   }
+
+  Vue.prototype.$forceUpdate = function () {
+    const vm: Component = this
+    if (vm._watcher) {
+      vm._watcher.update()
+    }
+  }
 }
 
 export function mountComponent(

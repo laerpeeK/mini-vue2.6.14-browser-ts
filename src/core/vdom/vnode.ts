@@ -9,6 +9,7 @@ export default class VNode {
   ns?: string
   elm: Node | void
   context: Component | void // rendered in this component's scope
+  componentInstance?: Component
 
   constructor(
     tag?: string,
@@ -26,6 +27,7 @@ export default class VNode {
     this.elm = elm
     this.context = context
     this.ns = undefined
+    this.componentInstance = undefined
   }
 }
 

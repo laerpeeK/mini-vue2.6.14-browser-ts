@@ -2,14 +2,6 @@
 个人学习Vue2源码使用
 Vue2.6.14 TS版本（仅供参考，更准确，完整ts版本可以参照官方库v.2.7.14的ts实现）
 
-个人理解Vue划分为以下几大模块
-
-1. 数据响应式
-2. 模板编译及指令实现
-3. vdom
-4. 组件，插件实现
-
-
 **详细进度** 
 该仓库已实现的源码部分参照下列√部分,对应vue2官方文档API  
   
@@ -18,9 +10,15 @@ Vue.config √
   
 ### 全局API
 Vue.nextTick √  
+Vue.set √  
+Vue.delete √  
 Vue.use √  
+Vue.mixin √  
 Vue.version √  
-  
+Vue.observable √  
+Vue.compile √  
+
+
 ### 选项/数据
 data √  
 props √  
@@ -38,12 +36,19 @@ render √
 beforeCreate √  
 created √  
 beforeMount √  
+beforeUpdate √  
+mounted √  
+updated √  
+
 errorCaptured √  
-   
+
+
 ### 选项/资源
   
 ### 选项/组合
-  
+mixins √  
+extends √  
+
 ### 选项/其他
 name √  
   
@@ -62,6 +67,8 @@ vm.\$set √
 vm.\$delete √  
   
 ### 实例方法/事件
+vm.\$mount √  
+vm.\$forceUpdate √  
   
 ### 实例方法/生命周期
 vm.\$nextTick √  
