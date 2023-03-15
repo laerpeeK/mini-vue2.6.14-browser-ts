@@ -10,7 +10,7 @@ import {
   isXlink,
   xlinkNS,
   getXlinkProp,
-} from '../../util/attrs'
+} from '@/platforms/web/util/attrs'
 
 function updateAttrs(oldVnode: VNodeWithData, vnode: VNodeWithData) {
   const opts = vnode.componentOptions

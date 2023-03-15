@@ -2,13 +2,35 @@ import type { ComponentOptions } from './options'
 import type Watcher from '@/core/observer/watcher'
 import type VNode from '../core/vdom/vnode'
 import { VNodeChildren, VNodeData } from './vnode'
+import { GlobalAPI } from './global-api';
 export declare class Component {
   constructor(options?: any)
   // constructor infomation
   static cid: number
   static options: Record<string, any>
+
+  // extend
+  static extend: GlobalAPI['extend']
   static superOptions: Record<string, any>
+  static extendOptions: Record<string, any>
+  static sealedOptions: Record<string, any>
   static super: typeof Component
+
+  // assets
+  static directive: GlobalAPI['directive']
+  static component: GlobalAPI['component']
+  static filter: GlobalAPI['filter']
+
+  // functional context constructor
+  static mixin: GlobalAPI['mixin']
+  static use: GlobalAPI['use']
+
+  // public properties
+  $el: any // so that we can attach __vue__ to it
+  $data: Record<string, any>
+  $props: Record<string, any>
+  $options: ComponentOptions
+
 
   // private properties
   _isVue: true
@@ -38,17 +60,12 @@ export declare class Component {
     refElm?: any
   ) => any
 
-  // public properties
-  $el: any // so that we can attach __vue__ to it
   $root: Component
-  $options: ComponentOptions
   $parent: Component | undefined
   $children: Array<Component>
   $refs: {
     [key: string]: Component | Element | Array<Component | Element> | undefined
   }
-  $data: Record<string, any>
-  $props: Record<string, any>
   $watch: (
     expOrFn: string | (() => any),
     cb: Function,

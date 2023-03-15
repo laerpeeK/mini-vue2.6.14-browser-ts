@@ -9,6 +9,8 @@ import { initMixin } from './mixin'
 import { mergeOptions } from '../util/options'
 import { defineReactive } from '../observer'
 import { ASSET_TYPES } from '@/shared/constant'
+import { initAssetRegisters } from './assets'
+import { initExtend } from './extend'
 
 export function initGlobalAPI(Vue: GlobalAPI) {
   // config
@@ -45,7 +47,7 @@ export function initGlobalAPI(Vue: GlobalAPI) {
   }
 
   Vue.options = Object.create(null)
-  ASSET_TYPES.forEach(type => {
+  ASSET_TYPES.forEach((type) => {
     Vue.options[type + 's'] = Object.create(null)
   })
 
@@ -55,4 +57,6 @@ export function initGlobalAPI(Vue: GlobalAPI) {
 
   initUse(Vue)
   initMixin(Vue)
+  initExtend(Vue)
+  initAssetRegisters(Vue)
 }

@@ -9,6 +9,7 @@ Vue2.6.14 TS版本（仅供参考，更准确，完整ts版本可以参照官方
 Vue.config √  
   
 ### 全局API
+Vue.extend √  
 Vue.nextTick √  
 Vue.set √  
 Vue.delete √  

@@ -328,6 +328,7 @@ export function stateMixin(Vue: typeof Component) {
   propsDef.get = function () {
     return this._props
   }
+
   if (process.env.NODE_ENV !== 'production') {
     dataDef.set = function () {
       warn(
@@ -346,6 +347,7 @@ export function stateMixin(Vue: typeof Component) {
 
   Vue.prototype.$set = set
   Vue.prototype.$delete = del
+  
   Vue.prototype.$watch = function (
     expOrFn: string | (() => any),
     cb: Function,

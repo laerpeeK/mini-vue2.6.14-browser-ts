@@ -1,16 +1,16 @@
 import Vue from './runtime'
 import type { Component } from '@/types/component'
 
-import { query } from './util'
+import { query } from '@/platforms/web/util'
 import { warn } from '@/core/util/debug'
-import { cached } from '@/shared/util'
 import { mark, measure } from '@/core/util/perf'
 import config from '@/core/config'
-import { compile, compileToFunctions } from './compiler'
+import { cached } from '@/shared/util'
+import { compile, compileToFunctions } from '@/platforms/web/compiler'
 import {
   shouldDecodeNewlines,
   shouldDecodeNewlinesForHref,
-} from './util/compat'
+} from '@/platforms/web/util/compat'
 
 const idToTemplate = cached((id) => {
   const el = query(id)
@@ -63,17 +63,19 @@ Vue.prototype.$mount = function (
         mark('compile')
       }
 
-      const { render, staticRenderFns } = compileToFunctions(
-        template,
-        {
-          outputSourceRange: process.env.NODE_ENV !== 'production',
-          comments: options.comments,
-          delimiters: options.delimiters,
-          shouldDecodeNewlines,
-          shouldDecodeNewlinesForHref
-        },
-        this
-      )
+      // const { render, staticRenderFns } = compileToFunctions(
+      //   template,
+      //   {
+      //     outputSourceRange: process.env.NODE_ENV !== 'production',
+      //     comments: options.comments,
+      //     delimiters: options.delimiters,
+      //     shouldDecodeNewlines,
+      //     shouldDecodeNewlinesForHref
+      //   },
+      //   this
+      // )
+      const render = function () {}
+      const staticRenderFns = []
       options.render = render
       options.staticRenderFns = staticRenderFns
 

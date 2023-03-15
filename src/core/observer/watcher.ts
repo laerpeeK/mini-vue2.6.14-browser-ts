@@ -4,10 +4,10 @@ import type { SimpleSet } from '../util/env'
 import { _Set as Set } from '../util/env'
 import { queueWatcher } from './scheduler'
 import { pushTarget, popTarget } from './dep'
-import { noop, isObject, remove } from '../../shared/util';
+import { noop, isObject, remove } from '../../shared/util'
 import { warn } from '../util/debug'
 import { parsePath } from '../util/lang'
-import { handleError, invokeWithErrorHandling } from '../util/error';
+import { handleError, invokeWithErrorHandling } from '../util/error'
 import { traverse } from './traverse'
 
 let uid = 0
@@ -51,13 +51,13 @@ export default class Watcher {
       vm._watcher = this
     }
     vm._watchers.push(this)
-    
+
     if (options) {
       this.lazy = !!options.lazy
       this.sync = !!options.sync
       this.user = !!options.user
       this.deep = !!options.deep
-      this.before  = options.before
+      this.before = options.before
     } else {
       this.deep = this.user = this.lazy = this.sync = false
     }
@@ -140,7 +140,13 @@ export default class Watcher {
         this.value = value
         if (this.user) {
           const info = `callback for watcher "${this.expression}"`
-          invokeWithErrorHandling(this.cb, this.vm, [value, oldValue], this.vm, info)          
+          invokeWithErrorHandling(
+            this.cb,
+            this.vm,
+            [value, oldValue],
+            this.vm,
+            info
+          )
         } else {
           this.cb.call(this.vm, value, oldValue)
         }

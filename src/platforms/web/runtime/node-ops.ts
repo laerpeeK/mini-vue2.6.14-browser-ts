@@ -1,4 +1,4 @@
-import { namespaceMap } from '../util/element'
+import { namespaceMap } from '@/platforms/web/util/element'
 import VNode from '@/core/vdom/vnode'
 
 /**

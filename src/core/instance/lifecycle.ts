@@ -64,7 +64,12 @@ export function lifecycleMixin(Vue: typeof Component) {
     if (!prevVnode) {
       // initial render
       vm.$el = vm.__patch__(vm.$el, vnode, hydrating, false /* removeOnly */)
+    } else {
+      vm.$el = vm.__patch__(prevVnode, vnode)
     }
+    restoreActiveInstance()
+
+    // update __vue__ reference
   }
 
   Vue.prototype.$forceUpdate = function () {

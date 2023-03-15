@@ -8,6 +8,7 @@ import { initLifecycle, callHook } from './lifecycle'
 import { initState } from './state'
 import { initRender } from './render'
 import { initEvents } from './events'
+import { extend } from '@/shared/util'
 
 let uid = 0
 
@@ -26,8 +27,8 @@ export function initMixin(Vue: typeof Component) {
     }
 
     // a flag to mark this as a Vue instance without having to do instanceof
-    // check
     vm._isVue = true
+    // merge options
     if (options && options._isComponent) {
       // optimize internal component instantiation
       // since dynamic options merging is pretty slow, and none of the
@@ -73,7 +74,38 @@ export function initMixin(Vue: typeof Component) {
 export function resolveConstructorOptions(Ctor: typeof Component) {
   let options = Ctor.options
   if (Ctor.super) {
+    // Vue.extend result
     // waitResolve
+    const superOptions = resolveConstructorOptions(Ctor.super)
+    const cachedSupperOptions = Ctor.superOptions
+    if (superOptions !== cachedSupperOptions) {
+      // super option changed
+      // need to resolve new options.
+      Ctor.superOptions = superOptions
+      // check if there are any late-modified/attached options (#4976)
+      const modifiedOptions = resolveModifedOptions(Ctor)
+      // update base extend options
+      if (modifiedOptions) {
+        extend(Ctor.extendOptions, modifiedOptions)
+      }
+      options = Ctor.options = mergeOptions(superOptions, Ctor.superOptions)
+      if (options.name) {
+        options.components[options.name] = Ctor
+      }
+    }
   }
   return options
+}
+
+function resolveModifedOptions(Ctor: typeof Component) {
+  let modified
+  const latest = Ctor.options
+  const sealed = Ctor.sealedOptions
+  for (const key in latest) {
+    if (latest[key] !== sealed[key]) {
+      if (!modified) modified = {}
+      modified[key] = latest[key]
+    }
+  }
+  return modified
 }

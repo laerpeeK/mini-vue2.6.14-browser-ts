@@ -1,7 +1,7 @@
 import type { GlobalAPI } from '@/types/global-api'
 import { ASSET_TYPES } from '@/shared/constant'
 import { validateComponentName } from '../util/options'
-import { isPlainObject } from '../../shared/util'
+import { isPlainObject } from '@/shared/util'
 
 export function initAssetRegisters(Vue: GlobalAPI) {
   /**

@@ -1,6 +1,6 @@
-import * as nodeOps from 'web/runtime/node-ops'
-import platformModules from 'web/runtime/modules'
-import baseModules from 'core/vdom/modules'
+import * as nodeOps from '@/platforms/web/runtime/node-ops'
+import platformModules from '@/platforms/web/runtime/modules'
+import baseModules from '@/core/vdom/modules'
 import { createPatchFunction } from '@/core/vdom/patch'
 // the directive module should be applied last, after all
 // built-in modules have been applied.

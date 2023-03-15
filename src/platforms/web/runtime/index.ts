@@ -1,16 +1,16 @@
-import Vue from '@/core'
 import type { Component } from '@/types/component'
+import Vue from '@/core'
 import { inBrowser } from '@/core/util/env'
-import { query } from '../util'
 import { mountComponent } from '@/core/instance/lifecycle'
 import { noop } from '@/shared/util'
-import { patch } from './patch'
-import { isReserevedAttr, mustUseProp } from '../util/attrs'
+import { patch } from '@/platforms/web/runtime/patch'
+import { query } from '@/platforms/web/util'
+import { isReserevedAttr, mustUseProp } from '@/platforms/web/util/attrs'
 import {
   isReservedTag,
   getTagNamespace,
   isUnknownElement,
-} from '../util/element'
+} from '@/platforms/web/util/element'
 
 // install platform specific utils
 Vue.config.mustUseProp = mustUseProp

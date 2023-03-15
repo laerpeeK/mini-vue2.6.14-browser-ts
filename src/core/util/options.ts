@@ -1,7 +1,7 @@
+import type { Component } from '@/types/component'
+import type { ComponentOptions } from '@/types/options'
 import config from '../config'
-import { LIFECYCLE_HOOKS } from '@/shared/constant'
-import { Component } from '@/types/component'
-import { ComponentOptions } from '@/types/options'
+import { ASSET_TYPES, LIFECYCLE_HOOKS } from '@/shared/constant'
 import { unicodeRegExp } from './lang'
 import { warn } from './debug'
 import { hasSymbol, nativeWatch } from './env'
@@ -11,9 +11,10 @@ import {
   isPlainObject,
   toRawType,
   extend,
+  isArray,
+  camelize,
 } from '@/shared/util'
 import { set } from '@/core/observer'
-import { isArray, camelize } from '@/shared/util'
 
 /**
  * Option overwriting strategies are functions that handle
@@ -21,6 +22,32 @@ import { isArray, camelize } from '@/shared/util'
  * value into the final value.
  */
 const strats = config.optionMergeStrategies
+
+/**
+ * Assets
+ *
+ * When a vm is present (instance creation), we need to do
+ * a three-way merge between constructor options, instance
+ * options and parent options
+ */
+function mergeAssets(
+  parentVal: Object | null,
+  childVal: Object | null,
+  vm: Component | null,
+  key: string
+) {
+  const res = Object.create(parentVal || null)
+  if (childVal) {
+    process.env.NODE_ENV !== 'production' && assertObjectType(key, childVal, vm)
+    return extend(res, childVal)
+  } else {
+    return res
+  }
+}
+
+ASSET_TYPES.forEach(function (type) {
+  strats[type + 's'] = mergeAssets
+})
 
 /**
  * Hooks and props are merged as arrays.
