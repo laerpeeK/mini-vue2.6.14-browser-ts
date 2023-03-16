@@ -13,7 +13,6 @@ export function genClassForVnode(vnode: VNodeWithData) {
     }
   }
 
-  // @ts-expect-error parentNode.parent not VNodeWithData
   while (isDef((parentNode = parentNode.parent))) {
     if (parentNode && parentNode.data) {
       data = mergeClassData(data, parentNode.data)

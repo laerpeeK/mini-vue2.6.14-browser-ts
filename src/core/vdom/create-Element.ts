@@ -1,11 +1,14 @@
 import type { Component } from '@/types/component'
 import type { VNodeData } from '@/types/vnode'
-import { isDef, isPrimitive } from '@/shared/util'
+import { isDef, isObject, isPrimitive, isTrue, isUndef } from '@/shared/util'
 import { warn } from '../util/debug'
 import VNode, { createEmptyVNode } from './vnode'
 import config from '../config'
+import { traverse } from '../observer/traverse'
+
 const ALWAYS_NORMALIZE = 2
 const SIMPLE_NORMALIZE = 1
+
 // wrapper function for providing a more flexible interface
 // without getting yelled at by flow
 export function createElement(
@@ -16,6 +19,7 @@ export function createElement(
   normalizationType: any,
   alwaysNormalize: boolean
 ) {
+  debugger
   if (Array.isArray(data) || isPrimitive(data)) {
     normalizationType = children
     children = data
@@ -73,7 +77,9 @@ export function _createElement(
     children.length = 0
   }
   if (normalizationType === ALWAYS_NORMALIZE) {
+    // debug
   } else if (normalizationType === SIMPLE_NORMALIZE) {
+    // debug
   }
   let vnode, ns
   if (typeof tag === 'string') {
@@ -113,9 +119,45 @@ export function _createElement(
     return vnode
   } else if (isDef(vnode)) {
     if (isDef(ns)) {
+      applyNS(vnode, ns)
     }
     if (isDef(data)) {
+      registerDeepBindings(data)
     }
     return vnode
+  } else {
+    return createEmptyVNode()
+  }
+}
+
+function applyNS(vnode, ns, force?: boolean) {
+  vnode.ns = ns
+  if (vnode.tag === 'foreignObject') {
+    // use default namespace inside foreignObject
+    ns = undefined
+    force = true
+  }
+  if (isDef(vnode.children)) {
+    for (let i = 0, l = vnode.children.length; i < l; i++) {
+      const child = vnode.children[i]
+      if (
+        isDef(child.tag) &&
+        (isUndef(child.ns) || (isTrue(force) && child.tag !== 'svg'))
+      ) {
+        applyNS(child, ns, force)
+      }
+    }
+  }
+}
+
+// ref #5318
+// necessary to ensure parent re-render when deep bindings like :style and
+// :class are used on slot nodes
+function registerDeepBindings(data) {
+  if (isObject(data.style)) {
+    traverse(data.style)
+  }
+  if (isObject(data.class)) {
+    traverse(data.class)
   }
 }

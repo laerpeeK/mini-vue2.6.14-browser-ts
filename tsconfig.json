@@ -12,7 +12,6 @@
     "allowJs": true, // 是否允许编译JS文件
     "noImplicitAny": false, // 在表达式和声明上有隐含的any类型时报错
     "noImplicitThis": false, // 当this表达式的值为any类型时，生成一个错误
-
     "noUnusedLocals": false, // 若有未使用的局部变量则抛出错误
     "experimentalDecorators": true, // 启用实验性的ES装饰器
     "resolveJsonModule": true, // 允许在 TypeScript 模块中导入 JSON 文件

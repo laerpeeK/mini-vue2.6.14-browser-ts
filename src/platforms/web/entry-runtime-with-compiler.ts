@@ -74,11 +74,13 @@ Vue.prototype.$mount = function (
       //   },
       //   this
       // )
-      const render = function () {}
+      const code = `with(this){return _c('div',{attrs:{"id":"app"}},[_v("Hello "+_s(title)+"!")])}`
+      const render = new Function(code)
+
       const staticRenderFns = []
       options.render = render
+      debugger
       options.staticRenderFns = staticRenderFns
-
       if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
         mark('compile end')
         measure(`vue ${this._name} compile`, 'compile', 'compile end')

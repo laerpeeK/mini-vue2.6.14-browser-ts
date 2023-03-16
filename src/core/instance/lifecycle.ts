@@ -70,6 +70,18 @@ export function lifecycleMixin(Vue: typeof Component) {
     restoreActiveInstance()
 
     // update __vue__ reference
+    if (prevEl) {
+      prevEl.__vue__ = null
+    }
+    if (vm.$el) {
+      vm.$el.__vue__ = vm
+    }
+    // if parent is an HOC, update its $el as well
+    if (vm.$vnode && vm.$parent && vm.$vnode === vm.$parent._vnode) {
+      vm.$parent.$el = vm.$el
+    }
+    // updated hook is called by the scheduler to ensure that children are
+    // updated in a parent's updated hook.
   }
 
   Vue.prototype.$forceUpdate = function () {

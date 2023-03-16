@@ -56,6 +56,14 @@ export function isPlainObject(obj: any): boolean {
   return _toString.call(obj) === '[object Object]'
 }
 
+export function toString(val: any) {
+  return val == null
+    ? ''
+    : Array.isArray(val) || (isPlainObject(val) && val.toString === _toString)
+    ? JSON.stringify(val, null, 2)
+    : String(val)
+}
+
 /**
  * Get the raw type string of a value, e.g., [object Object].
  */
@@ -236,6 +244,10 @@ export function toArray(list: any, start?: number): Array<any> {
   return ret
 }
 
+export function toNumber(val: string): number | string {
+  const n = parseFloat(val)
+  return isNaN(n) ? val : n
+}
 /**
  * return a Readonly object
  */

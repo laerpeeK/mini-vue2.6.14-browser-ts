@@ -13,6 +13,7 @@ import {
 } from '@/platforms/web/util/attrs'
 
 function updateAttrs(oldVnode: VNodeWithData, vnode: VNodeWithData) {
+  debugger
   const opts = vnode.componentOptions
   if (isDef(opts) && opts.Ctor.options.inheritAttrs === false) {
     return
@@ -25,7 +26,7 @@ function updateAttrs(oldVnode: VNodeWithData, vnode: VNodeWithData) {
   const oldAttrs = oldVnode.data.attrs || {}
   let attrs: any = vnode.data.attrs || {}
   // clone observed objects, as the user probably wants to mutate it
-  if (isDef(attrs.__ob__) || isTrue(attrs._v_attr_proxy)) {
+  if (isDef(attrs.__ob__)) {
     attrs = vnode.data.attrs = extend({}, attrs)
   }
 
@@ -55,6 +56,7 @@ function updateAttrs(oldVnode: VNodeWithData, vnode: VNodeWithData) {
 
 function setAttr(el: Element, key: string, value: any, isInPre?: any) {
   if (isInPre || el.tagName.indexOf('-') > -1) {
+    baseSetAttr(el, key, value)
   } else if (isBooleanAttr(key)) {
     // set attribute for blank value
     // e.g. <option disabled>Select one</option>
@@ -63,7 +65,7 @@ function setAttr(el: Element, key: string, value: any, isInPre?: any) {
     } else {
       // technically allowfullscreen is a boolean attribute for <iframe>,
       // but Flash expects a value of "true" when used on <embed> tag
-      value = key == 'allowfullscreen' && el.tagName === 'EMBED' ? 'true' : key
+      value = key === 'allowfullscreen' && el.tagName === 'EMBED' ? 'true' : key
       el.setAttribute(key, value)
     }
   } else if (isEnumeratedAttr(key)) {
