@@ -63,7 +63,7 @@ export default class VNode {
     this.isAsyncPlaceholder = false
   }
 
-  // DEPRECATED: aliasfor componentInstance for backwards compat.
+  // DEPRECATED: alias for componentInstance for backwards compat.
   get child(): Component | void {
     return this.componentInstance
   }

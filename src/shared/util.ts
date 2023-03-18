@@ -248,6 +248,16 @@ export function toNumber(val: string): number | string {
   const n = parseFloat(val)
   return isNaN(n) ? val : n
 }
+
+export function toObject(arr: Array<any>): Object {
+  const res = {}
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i]) {
+      extend(res, arr[i])
+    }
+  }
+  return res
+}
 /**
  * return a Readonly object
  */

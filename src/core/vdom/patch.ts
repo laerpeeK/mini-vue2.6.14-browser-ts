@@ -5,8 +5,9 @@ import config from '../config'
 import { warn } from '../util/debug'
 import VNode from './vnode'
 import { activeInstance } from '../instance/lifecycle'
+import { VNodeWithData } from '@/types/vnode'
 
-export const emptyNode = new VNode('', {}, [])
+export const emptyNode = new VNode('', {}, []) as VNodeWithData
 const hooks = ['create', 'activate', 'update', 'remove', 'destroy']
 
 function sameVnode(a, b) {
@@ -195,8 +196,6 @@ export function createPatchFunction(backend) {
         ? nodeOps.createElementNS(vnode.ns, tag)
         : nodeOps.createElement(tag, vnode)
       setScope(vnode)
-
-      debugger
       createChildren(vnode, children, insertedVnodeQueue)
       if (isDef(data)) {
         invokeCreateHooks(vnode, insertedVnodeQueue)
@@ -259,6 +258,7 @@ export function createPatchFunction(backend) {
       if (isDef(ch)) {
         if (isDef(ch.tag)) {
           removeAndInvokeRemoveHook(ch)
+          invokeDestroyHook(ch)
         } else {
           // text node
           removeNode(ch.elm)
@@ -267,9 +267,44 @@ export function createPatchFunction(backend) {
     }
   }
 
+  function createRmCb(childElm, listeners) {
+    function remove() {
+      if (--remove.listeners === 0) {
+        removeNode(childElm)
+      }
+    }
+    remove.listeners = listeners
+    return remove
+  }
+
   function removeAndInvokeRemoveHook(vnode, rm?) {
+    debugger
     if (isDef(rm) || isDef(vnode.data)) {
-      // debugger
+      let i
+      const listeners = cbs.remove.length + 1
+      if (isDef(rm)) {
+        //
+        debugger
+      } else {
+        // directly removing
+        rm = createRmCb(vnode.elm, listeners)
+      }
+      // recursively invoke hooks on child component root node
+      if (
+        isDef((i = vnode.componentInstance)) &&
+        isDef((i = i._vode)) &&
+        isDef(i.data)
+      ) {
+        debugger
+      }
+      for (i = 0; i < cbs.remove.length; ++i) {
+        cbs.remove[i](vnode, rm)
+      }
+      if (isDef((i = vnode.data.hook)) && isDef((i = i.remove))) {
+        i(vnode.rm)
+      } else {
+        rm()
+      }
     } else {
       removeNode(vnode.elm)
     }

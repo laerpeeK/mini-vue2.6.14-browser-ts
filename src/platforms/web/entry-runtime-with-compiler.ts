@@ -74,7 +74,7 @@ Vue.prototype.$mount = function (
       //   },
       //   this
       // )
-      const code = `with(this){return _c('div',{attrs:{"id":"app"}},[_v("Hello "+_s(title)+"!")])}`
+      const code = `with(this){return _c('div',{style:('color: red; background-color:'+bgc +';'),attrs:{"id":"app"}},[_v("Hello "+_s(title)+"!")])}`
       const render = new Function(code)
 
       const staticRenderFns = []

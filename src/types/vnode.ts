@@ -12,6 +12,9 @@ export interface VNodeData {
   attrs?: {[key: string]: any}
   staticClass?: string
   class?: any
+  staticStyle?: {[key: string]: any}
+  style?: string | Array<Object> | Object
+  normalizedStyle?: Object
   [key: string]: any
 }
 
@@ -26,14 +29,14 @@ export type VNodeComponentOptions = {
 export type VNodeWithData = VNode & {
   tag: string
   data: VNodeData
-  children: Array<VNode>
+  children?: Array<VNode>
   text: void
   elm: any
   ns: string | void
   context: Component
   key: string | number | undefined
   parent?: VNodeWithData
-  isRootInsert: boolean
   componentOptions?: VNodeComponentOptions
   componentInstance?: Component
+  isRootInsert: boolean
 }
