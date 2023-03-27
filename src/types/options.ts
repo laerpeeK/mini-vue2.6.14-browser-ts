@@ -62,3 +62,11 @@ export type PropOptions = {
   required?: boolean | null
   validator?: Function | null
 }
+
+export type InternalComponentOptions = {
+  _isComponent: true
+  parent: Component
+  _parentVnode: VNode
+  render?: Function
+  staticRenderFns?: Array<Function>
+}

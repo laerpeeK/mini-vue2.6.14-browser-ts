@@ -2,7 +2,7 @@ import type { ComponentOptions } from './options'
 import type Watcher from '@/core/observer/watcher'
 import type VNode from '../core/vdom/vnode'
 import { VNodeChildren, VNodeData } from './vnode'
-import { GlobalAPI } from './global-api';
+import { GlobalAPI } from './global-api'
 export declare class Component {
   constructor(options?: any)
   // constructor infomation
@@ -30,7 +30,8 @@ export declare class Component {
   $data: Record<string, any>
   $props: Record<string, any>
   $options: ComponentOptions
-
+  $slots: { [key: string]: Array<VNode> }
+  $scopedSlots: { [key: string]: () => VNodeChildren }
 
   // private properties
   _isVue: true
@@ -59,6 +60,7 @@ export declare class Component {
     parentElm?: any,
     refElm?: any
   ) => any
+  _events: Object
 
   $root: Component
   $parent: Component | undefined

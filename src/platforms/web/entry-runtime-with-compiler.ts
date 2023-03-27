@@ -12,6 +12,13 @@ import {
   shouldDecodeNewlinesForHref,
 } from '@/platforms/web/util/compat'
 
+let i = 2
+const codes = [
+  `with(this){return _c('div',{attrs:{"id":"app"}},[_c('my-component')],1)}`,
+  `with(this){return _c('div',[_v("Hello Vue Component!")])}`,
+  `with(this){return _c('div',{attrs:{"id":"app"}},[_c('my-component',{attrs:{"user":user}})],1)}`,
+  `with(this){return _c('div',[_v("Hello "+_s(user)+"!")])}`
+]
 const idToTemplate = cached((id) => {
   const el = query(id)
   return el && el.innerHTML
@@ -74,12 +81,11 @@ Vue.prototype.$mount = function (
       //   },
       //   this
       // )
-      const code = `with(this){return _c('div',{style:('color: red; background-color:'+bgc +';'),attrs:{"id":"app"}},[_v("Hello "+_s(title)+"!")])}`
+      let code = codes[i++]
       const render = new Function(code)
-
+      
       const staticRenderFns = []
       options.render = render
-      debugger
       options.staticRenderFns = staticRenderFns
       if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
         mark('compile end')

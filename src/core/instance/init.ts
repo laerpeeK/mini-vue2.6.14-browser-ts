@@ -9,6 +9,7 @@ import { initState } from './state'
 import { initRender } from './render'
 import { initEvents } from './events'
 import { extend } from '@/shared/util'
+import { InternalComponentOptions } from '@/types/options'
 
 let uid = 0
 
@@ -33,6 +34,8 @@ export function initMixin(Vue: typeof Component) {
       // optimize internal component instantiation
       // since dynamic options merging is pretty slow, and none of the
       // internal component options needs special treatment.
+      debugger
+      initInternalComponent(vm, options as InternalComponentOptions)
     } else {
       vm.$options = mergeOptions(
         resolveConstructorOptions(vm.constructor as any) || {},
@@ -71,11 +74,29 @@ export function initMixin(Vue: typeof Component) {
   }
 }
 
+export function initInternalComponent(vm: Component, options: InternalComponentOptions) {
+  // @ts-expect-error
+  const opts = vm.$options = Object.create(vm.constructor.options)
+  // doing this because it's faster than dynamic enumeration.
+  const parentVnode = options._parentVnode
+  opts.parent = options.parent
+  opts._parentVnode = parentVnode
+
+  const vnodeComponentOptions = parentVnode.componentOptions
+  opts.propsData = vnodeComponentOptions?.propsData
+  opts._parentListeners = vnodeComponentOptions?.listeners
+  opts._renderChildren = vnodeComponentOptions?.children
+  opts._componentTag = vnodeComponentOptions?.tag
+
+  if (options.render) {
+    opts.render = options.render
+    opts.staticRenderFns = options.staticRenderFns
+  }
+}
+
 export function resolveConstructorOptions(Ctor: typeof Component) {
   let options = Ctor.options
   if (Ctor.super) {
-    // Vue.extend result
-    // waitResolve
     const superOptions = resolveConstructorOptions(Ctor.super)
     const cachedSupperOptions = Ctor.superOptions
     if (superOptions !== cachedSupperOptions) {
@@ -88,7 +109,7 @@ export function resolveConstructorOptions(Ctor: typeof Component) {
       if (modifiedOptions) {
         extend(Ctor.extendOptions, modifiedOptions)
       }
-      options = Ctor.options = mergeOptions(superOptions, Ctor.superOptions)
+      options = Ctor.options = mergeOptions(superOptions, Ctor.extendOptions)
       if (options.name) {
         options.components[options.name] = Ctor
       }

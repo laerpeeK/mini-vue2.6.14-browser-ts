@@ -18,6 +18,8 @@ export function initRender(vm: Component) {
   const options = vm.$options
   const parentVNode = (vm.$vnode = options._parentVNode) // the placeholder node in parent node
   const renderContext = parentVNode && parentVNode.context
+  vm.$slots = emptyObject
+  vm.$scopedSlots = emptyObject
   // bind the createElement fn to this instance
   // so that we get proper render context inside it.
   // args order: tag, data, children, normalizationType, alwaysNormalize

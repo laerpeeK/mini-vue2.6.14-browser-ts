@@ -40,3 +40,11 @@ export type VNodeWithData = VNode & {
   componentInstance?: Component
   isRootInsert: boolean
 }
+
+export type MountedComponentVNode = {
+  context: Component
+  componentOptions: VNodeComponentOptions
+  componentInstance: Component
+  parent: VNode
+  data: VNodeData
+}

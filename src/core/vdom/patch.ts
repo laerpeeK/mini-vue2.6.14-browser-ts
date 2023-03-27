@@ -6,6 +6,7 @@ import { warn } from '../util/debug'
 import VNode from './vnode'
 import { activeInstance } from '../instance/lifecycle'
 import { VNodeWithData } from '@/types/vnode'
+import { registerRef } from './modules/ref'
 
 export const emptyNode = new VNode('', {}, []) as VNodeWithData
 const hooks = ['create', 'activate', 'update', 'remove', 'destroy']
@@ -110,7 +111,6 @@ export function createPatchFunction(backend) {
   }
 
   function invokeCreateHooks(vnode, insertedVnodeQueue) {
-    debugger
     for (let i = 0; i < cbs.create.length; ++i) {
       cbs.create[i](emptyNode, vnode)
     }
@@ -214,21 +214,41 @@ export function createPatchFunction(backend) {
     }
   }
 
-  function createComponent(vnode, insertedVnodeBefore, parentElm, refElm) {
+  function initComponent(vnode: VNodeWithData, insertedVnodeQueue: Array<VNodeWithData>) {
+    if (isDef(vnode.data.pendingInsert)) {
+      insertedVnodeQueue.push.apply(insertedVnodeQueue, vnode.data.pendingInsert)
+      vnode.data.pendingInsert = null
+    }
+    vnode.elm = vnode.componentInstance?.$el
+    if (isPatchable(vnode)) {
+      invokeCreateHooks(vnode, insertedVnodeQueue)
+      setScope(vnode)
+    } else {
+      // empty component root.
+      // skip all element-related modules except for ref (#3455)
+      registerRef(vnode)
+      insertedVnodeQueue.push(vnode)
+    }
+  }
+
+  function createComponent(vnode, insertedVnodeQueue, parentElm, refElm) {
     let i = vnode.data
     if (isDef(i)) {
       const isReactivated = isDef(vnode.componentInstance) && i.keepalive
       if (isDef((i = i.hook)) && isDef((i = i.init))) {
-        i(vnode, false)
+        i(vnode, false /* hydrating */)
       }
 
       // after calling the init hook, if the vnode is a child component
       // it should've created a child instance and mounted it. the child
       // component also has set the palceholder vnode's elm.
       if (isDef(vnode.componentInstance)) {
+        initComponent(vnode, insertedVnodeQueue)
+        insert(parentElm, vnode.elm, refElm)
         if (isTrue(isReactivated)) {
-          return true
+          debugger
         }
+        return true
       }
     }
   }
@@ -278,7 +298,6 @@ export function createPatchFunction(backend) {
   }
 
   function removeAndInvokeRemoveHook(vnode, rm?) {
-    debugger
     if (isDef(rm) || isDef(vnode.data)) {
       let i
       const listeners = cbs.remove.length + 1
