@@ -4,6 +4,7 @@ import { initMixin } from './init'
 import { renderMixin } from './render'
 import { stateMixin } from './state'
 import { lifecycleMixin } from './lifecycle'
+import { eventsMixin } from './events'
 
 function Vue(options) {
   if (process.env.NODE_ENV !== 'production' && !(this instanceof Vue)) {
@@ -20,8 +21,8 @@ initMixin(Vue)
 // Vue.prototype.$data $props $set $delete $watch
 stateMixin(Vue)
 
-// //@ts-expect-error Vue has function type
-// eventsMixin(Vue)
+//@ts-expect-error Vue has function type
+eventsMixin(Vue)
 
 //@ts-expect-error Vue has function type
 lifecycleMixin(Vue)

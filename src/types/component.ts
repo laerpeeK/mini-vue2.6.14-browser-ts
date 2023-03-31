@@ -96,6 +96,10 @@ export declare class Component {
   ) => VNode
   $nextTick: (fn: (...args: any[]) => any) => void | Promise<any>
   $forceUpdate: () => void
+  $on: (event: string | Array<string>, fn: Function) => Component
+  $once: (event: string, fn: Function) => Component
+  $off: (event?: string | Array<string>, fn?: Function) => Component
+  $emit: (event: string, ...args: Array<any>) => Component
 
   // lifecycle
   _init: Function

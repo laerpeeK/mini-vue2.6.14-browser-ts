@@ -15,6 +15,7 @@ let uid = 0
 
 export function initMixin(Vue: typeof Component) {
   Vue.prototype._init = function (options?: Record<string, any>) {
+    debugger
     const vm: Component = this
     // a uid
     vm._uid = uid++
@@ -34,7 +35,6 @@ export function initMixin(Vue: typeof Component) {
       // optimize internal component instantiation
       // since dynamic options merging is pretty slow, and none of the
       // internal component options needs special treatment.
-      debugger
       initInternalComponent(vm, options as InternalComponentOptions)
     } else {
       vm.$options = mergeOptions(

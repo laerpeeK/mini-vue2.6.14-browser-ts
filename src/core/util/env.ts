@@ -10,6 +10,20 @@ export const isChrome = UA && /chrome\/\d+/.test(UA) && !isEdge
 export const isPhantomJS = UA && /phantomjs/.test(UA)
 export const isFF = UA && UA.match(/firefox\/(\d+)/)
 
+export let supportsPassive = false
+if (inBrowser) {
+  try {
+    const opts = {}
+    Object.defineProperty(opts, 'passive', {
+      get() {
+        supportsPassive = true
+      },
+    })
+    // @ts-expect-error
+    window.addEventListener('test-passive', null, opts)
+  } catch (e) {}
+}
+
 // can we use __proto__?
 export const hasProto = '__proto__' in {}
 
@@ -26,7 +40,8 @@ export const isServerRendering = () => {
     if (!inBrowser && !inWeex && typeof global !== 'undefined') {
       // detect presence of vue-server-renderer and avoid
       // Webpack shimming the process
-      _isServer = global['process'] && global['process'].env.VUE_ENV === 'server'
+      _isServer =
+        global['process'] && global['process'].env.VUE_ENV === 'server'
     } else {
       _isServer = false
     }

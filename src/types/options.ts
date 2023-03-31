@@ -51,9 +51,13 @@ export type ComponentOptions = {
   comments?: boolean
 
   // private
-  _componentTag: string | null
-  _propKeys?: Array<string>
   _base: GlobalAPI
+  _isComponent?: true
+  _parentVnode?: VNode
+  _parentListeners?: Object
+  _renderChildren?: Array<VNode>
+  _componentTag?: string
+  _propKeys?: Array<string>
 }
 
 export type PropOptions = {

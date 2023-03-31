@@ -12,12 +12,14 @@ import {
   shouldDecodeNewlinesForHref,
 } from '@/platforms/web/util/compat'
 
-let i = 2
+let i = 4
 const codes = [
   `with(this){return _c('div',{attrs:{"id":"app"}},[_c('my-component')],1)}`,
   `with(this){return _c('div',[_v("Hello Vue Component!")])}`,
   `with(this){return _c('div',{attrs:{"id":"app"}},[_c('my-component',{attrs:{"user":user}})],1)}`,
-  `with(this){return _c('div',[_v("Hello "+_s(user)+"!")])}`
+  `with(this){return _c('div',[_v("Hello "+_s(user)+"!")])}`,
+  `with(this){return _c('div',{attrs:{"id":"app"}},[_c('my-component',{on:{"bu":componentClick}})],1)}`,
+  `with(this){return _c('div',[_c('div',{on:{"click":function($event){return $emit("bu",1)}}},[_v("Hello Vue Component!")])])}`
 ]
 const idToTemplate = cached((id) => {
   const el = query(id)
