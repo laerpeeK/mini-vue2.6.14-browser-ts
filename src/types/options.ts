@@ -43,6 +43,11 @@ export type ComponentOptions = {
   components?: { [key: string]: Component }
   filters?: { [key: string]: Function }
 
+  // context
+  provide?:
+    | { [key: string | symbol]: any }
+    | (() => { [key: string | symbol]: any })
+
   // misc
   parent?: Component
   mixins?: Array<object>

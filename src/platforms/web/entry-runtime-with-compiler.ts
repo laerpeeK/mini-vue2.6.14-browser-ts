@@ -7,20 +7,12 @@ import { mark, measure } from '@/core/util/perf'
 import config from '@/core/config'
 import { cached } from '@/shared/util'
 import { compile, compileToFunctions } from '@/platforms/web/compiler'
+
 import {
   shouldDecodeNewlines,
   shouldDecodeNewlinesForHref,
 } from '@/platforms/web/util/compat'
 
-let i = 4
-const codes = [
-  `with(this){return _c('div',{attrs:{"id":"app"}},[_c('my-component')],1)}`,
-  `with(this){return _c('div',[_v("Hello Vue Component!")])}`,
-  `with(this){return _c('div',{attrs:{"id":"app"}},[_c('my-component',{attrs:{"user":user}})],1)}`,
-  `with(this){return _c('div',[_v("Hello "+_s(user)+"!")])}`,
-  `with(this){return _c('div',{attrs:{"id":"app"}},[_c('my-component',{on:{"bu":componentClick}})],1)}`,
-  `with(this){return _c('div',[_c('div',{on:{"click":function($event){return $emit("bu",1)}}},[_v("Hello Vue Component!")])])}`
-]
 const idToTemplate = cached((id) => {
   const el = query(id)
   return el && el.innerHTML
@@ -72,21 +64,18 @@ Vue.prototype.$mount = function (
         mark('compile')
       }
 
-      // const { render, staticRenderFns } = compileToFunctions(
-      //   template,
-      //   {
-      //     outputSourceRange: process.env.NODE_ENV !== 'production',
-      //     comments: options.comments,
-      //     delimiters: options.delimiters,
-      //     shouldDecodeNewlines,
-      //     shouldDecodeNewlinesForHref
-      //   },
-      //   this
-      // )
-      let code = codes[i++]
-      const render = new Function(code)
-      
-      const staticRenderFns = []
+      const { render, staticRenderFns } = compileToFunctions(
+        template,
+        {
+          outputSourceRange: process.env.NODE_ENV !== 'production',
+          comments: options.comments,
+          delimiters: options.delimiters,
+          shouldDecodeNewlines,
+          shouldDecodeNewlinesForHref,
+        },
+        this
+      )
+
       options.render = render
       options.staticRenderFns = staticRenderFns
       if (process.env.NODE_ENV !== 'production' && config.performance && mark) {

@@ -10,6 +10,7 @@ import { initRender } from './render'
 import { initEvents } from './events'
 import { extend } from '@/shared/util'
 import { InternalComponentOptions } from '@/types/options'
+import { initProvide, initInjections } from './inject'
 
 let uid = 0
 
@@ -55,9 +56,9 @@ export function initMixin(Vue: typeof Component) {
     initEvents(vm)
     initRender(vm)
     callHook(vm, 'beforeCreate')
-    // initInjections(vm) // resolve injections before data/props
+    initInjections(vm) // resolve injections before data/props
     initState(vm)
-    // initProvide(vm) // resolve provide after data/props
+    initProvide(vm) // resolve provide after data/props
     callHook(vm, 'created')
 
     if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
@@ -74,9 +75,12 @@ export function initMixin(Vue: typeof Component) {
   }
 }
 
-export function initInternalComponent(vm: Component, options: InternalComponentOptions) {
+export function initInternalComponent(
+  vm: Component,
+  options: InternalComponentOptions
+) {
   // @ts-expect-error
-  const opts = vm.$options = Object.create(vm.constructor.options)
+  const opts = (vm.$options = Object.create(vm.constructor.options))
   // doing this because it's faster than dynamic enumeration.
   const parentVnode = options._parentVnode
   opts.parent = options.parent

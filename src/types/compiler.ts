@@ -133,3 +133,18 @@ export type ASTAttr = {
   start?: number
   end?: number
 }
+
+export type ASTModifiers = { [key: string]: boolean }
+
+export type ASTElementHandler = {
+  value: string
+  params?: Array<any>
+  modifiers?: ASTModifiers
+  dynamic?: boolean
+  start?: number
+  end?: number
+}
+
+export type ASTElementHandlers = {
+  [key: string]: ASTElementHandler | Array<ASTElementHandler>
+}

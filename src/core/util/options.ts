@@ -142,6 +142,7 @@ strats.watch = function (
  */
 strats.props =
   strats.methods =
+  strats.inject =
   strats.computed =
     function (
       parentVal: Object | null,
@@ -244,6 +245,8 @@ strats.data = function (
   return mergeDataOrFn(parentVal, childVal, vm)
 }
 
+strats.provide = mergeDataOrFn
+
 /**
  * Default strategy.
  */
@@ -335,6 +338,7 @@ export function mergeOptions(
   }
 
   normalizeProps(child, vm)
+  normalizeInject(child, vm)
 
   // Apply extends and mixins on the child options.
   // but only if it is a raw options object that isn't
@@ -370,6 +374,30 @@ export function mergeOptions(
   }
 
   return options
+}
+
+function normalizeInject(options: Record<string, any>, vm?: Component | null) {
+  const inject = options.inject
+  if (!inject) return
+  const normalized = (options.inject = {})
+  if (Array.isArray(inject)) {
+    for (let i = 0; i < inject.length; i++) {
+      normalized[inject[i]] = { from: inject[i] }
+    }
+  } else if (isPlainObject(inject)) {
+    for (const key in inject) {
+      const val = inject[key]
+      normalized[key] = isPlainObject(val)
+        ? extend({ from: key }, val)
+        : { from: val }
+    }
+  } else if (process.env.NODE_ENV !== 'production') {
+    warn(
+      `Invalid value for option "inject": expected an Array or an Object, ` +
+        `but got ${toRawType(inject)}.`,
+      vm
+    )
+  }
 }
 
 /**

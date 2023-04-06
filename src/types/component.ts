@@ -61,6 +61,7 @@ export declare class Component {
     refElm?: any
   ) => any
   _events: Object
+  _provided?: { [key: string | symbol]: any }
 
   $root: Component
   $parent: Component | undefined
