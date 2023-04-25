@@ -16,7 +16,6 @@ export function initProvide(vm: Component) {
 }
 
 export function initInjections(vm: Component) {
-  debugger
   const result = resolveInject(vm.$options.inject, vm)
   if (result) {
     toggleObserving(false)

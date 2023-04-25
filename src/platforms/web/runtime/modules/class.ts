@@ -3,7 +3,6 @@ import { isDef, isUndef } from '@/shared/util'
 import { concat, genClassForVnode, stringifyClass } from '@/platforms/web/util/class'
 
 function updateClass(oldVnode, vnode) {
-  debugger
   const el = vnode.elm
   const data: VNodeData = vnode.data
   const oldData: VNodeData = oldVnode.data

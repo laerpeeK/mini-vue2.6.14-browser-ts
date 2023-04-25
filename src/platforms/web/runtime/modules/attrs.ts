@@ -13,7 +13,6 @@ import {
 } from '@/platforms/web/util/attrs'
 
 function updateAttrs(oldVnode: VNodeWithData, vnode: VNodeWithData) {
-  debugger
   const opts = vnode.componentOptions
   if (isDef(opts) && opts.Ctor.options.inheritAttrs === false) {
     return

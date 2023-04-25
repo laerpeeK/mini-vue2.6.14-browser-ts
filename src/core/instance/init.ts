@@ -16,7 +16,6 @@ let uid = 0
 
 export function initMixin(Vue: typeof Component) {
   Vue.prototype._init = function (options?: Record<string, any>) {
-    debugger
     const vm: Component = this
     // a uid
     vm._uid = uid++

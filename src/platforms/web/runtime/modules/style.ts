@@ -53,7 +53,6 @@ const normalize = cached(function (prop) {
 })
 
 function updateStyle(oldVnode: VNodeWithData, vnode: VNodeWithData) {
-  debugger
   const data = vnode.data
   const oldData = oldVnode.data
   if (
